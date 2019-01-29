@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/contests/{contestId}")
+@CrossOrigin
 public class ContestSubscriptionController {
 
 
