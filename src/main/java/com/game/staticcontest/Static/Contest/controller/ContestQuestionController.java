@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/contests/{contestId}/questions")
+@CrossOrigin
 public class ContestQuestionController {
 
     @Autowired
