@@ -1,6 +1,7 @@
 package com.game.staticcontest.Static.Contest.entity;
 
 import org.hibernate.annotations.GeneratorType;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -8,6 +9,8 @@ import javax.persistence.*;
 public class ContestQuestion {
 
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name="uuid",strategy = "uuid2")
     private String contestQuestionId;
 
 
