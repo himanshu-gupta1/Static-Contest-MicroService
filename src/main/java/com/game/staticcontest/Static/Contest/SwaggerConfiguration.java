@@ -21,7 +21,7 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.game.staticcontest.Static.Contest.controller"))
-                .paths(regex("/*.*"))
+     //           .paths(regex("/*.*"))
                 .build();
 //                .apiInfo(metaData());
     }

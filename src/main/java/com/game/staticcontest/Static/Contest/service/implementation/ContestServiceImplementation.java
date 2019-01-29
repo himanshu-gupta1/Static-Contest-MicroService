@@ -22,21 +22,24 @@ public class ContestServiceImplementation implements ContestService {
     private ContestRepository contestRepository;
 
     @Override
-    public ResponseDTO<Void> addContest(Contest contest) {
-        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+    public ResponseDTO<ContestDTO> addContest(Contest contest) {
+        ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
 
 
-        contestRepository.save(contest);
+        Contest contestAdded=contestRepository.save(contest);
 
         responseDTO.setStatus("success");
         responseDTO.setErrorMessage("");
+        ContestDTO contestDTO=new ContestDTO();
+        BeanUtils.copyProperties(contestAdded,contestDTO);
 
-        responseDTO.setResponse(null);
+        responseDTO.setResponse(contestDTO);
 
         return responseDTO;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseDTO<List<ContestDTO>> getAllContest() {
         List<ContestDTO> contestDTOList=new ArrayList<>();
         for(Contest contest:contestRepository.findAll())
@@ -56,6 +59,7 @@ public class ContestServiceImplementation implements ContestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseDTO<ContestDTO> getContest(String contestId) {
         ResponseDTO<ContestDTO> responseDTO=new ResponseDTO<>();
         responseDTO.setStatus("success");

@@ -1,21 +1,13 @@
-package com.game.staticcontest.Static.Contest.entity;
+package com.game.staticcontest.Static.Contest.dto;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.game.staticcontest.Static.Contest.entity.Contest;
 
-import javax.persistence.*;
+public class ContestSubscribedDTO {
 
-@Entity
-public class ContestSubscribed {
-
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name="uuid",strategy = "uuid2")
     private String ContestsubscribedId;
 
     private String userId;
 
-    @ManyToOne()
-    @JoinColumn(name = "contest_id")
     private Contest contest;
 
     private boolean finished;
