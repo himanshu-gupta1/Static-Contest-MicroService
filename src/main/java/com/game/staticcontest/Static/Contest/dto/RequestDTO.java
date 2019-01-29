@@ -19,4 +19,12 @@ public class RequestDTO<T> {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    @Override
+    public String toString() {
+        return "RequestDTO{" +
+                "request=" + request +
+                ", userId='" + userId + '\'' +
+                '}';
+    }
 }
