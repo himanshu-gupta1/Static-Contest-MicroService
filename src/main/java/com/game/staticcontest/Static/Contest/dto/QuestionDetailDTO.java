@@ -7,7 +7,7 @@ public class QuestionDetailDTO {
 
     private String questionId;
     private String name;
-    private ContentDTO contentDTO;
+    private String content;
     private List<OptionDTO> optionDTOList;
     private List<OptionDTO> correctDTOList;
     private String category;
@@ -33,13 +33,7 @@ public class QuestionDetailDTO {
         this.name = name;
     }
 
-    public ContentDTO getContentDTO() {
-        return contentDTO;
-    }
 
-    public void setContentDTO(ContentDTO contentDTO) {
-        this.contentDTO = contentDTO;
-    }
 
     public List<OptionDTO> getOptionDTOList() {
         return optionDTOList;
@@ -98,12 +92,20 @@ public class QuestionDetailDTO {
     }
 
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     @Override
     public String toString() {
         return "QuestionDetailDTO{" +
                 "questionId='" + questionId + '\'' +
                 ", name='" + name + '\'' +
-                ", contentDTO=" + contentDTO +
+                ", content='" + content + '\'' +
                 ", optionDTOList=" + optionDTOList +
                 ", correctDTOList=" + correctDTOList +
                 ", category='" + category + '\'' +
