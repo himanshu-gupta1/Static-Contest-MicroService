@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ContestService {
 
-    ResponseDTO<Void> addContest(Contest contest);
+    ResponseDTO<ContestDTO> addContest(Contest contest);
 
     ResponseDTO<List<ContestDTO>> getAllContest();
 

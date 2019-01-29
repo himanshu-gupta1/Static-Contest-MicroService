@@ -19,24 +19,25 @@ public class ContestController {
     private ContestService contestService;
 
     @PostMapping("/")
-    public ResponseDTO<Void> addContest(@RequestBody RequestDTO<ContestDTO> requestDTO) {
+    public ResponseDTO<ContestDTO> addContest(@RequestBody RequestDTO<ContestDTO> requestDTO) {
 
         try {
             if (verifyUser(requestDTO.getUserId())) {
                 Contest contest = new Contest();
+                contest.setActive(false);
                 ContestDTO contestDTO = requestDTO.getRequest();
                 BeanUtils.copyProperties(contestDTO, contest);
 
                 return contestService.addContest(contest);
             } else {
-                ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+                ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("Auth Failed");
                 responseDTO.setErrorMessage("");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+            ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
