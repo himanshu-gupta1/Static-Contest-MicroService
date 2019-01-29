@@ -7,4 +7,6 @@ public interface ContestService {
 
     ResponseDTO<Void> addContest(Contest contest);
 
+
+
 }
