@@ -32,8 +32,8 @@ public class ContestController {
                 return contestService.addContest(contest);
             } else {
                 ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
-                responseDTO.setStatus("Auth Failed");
-                responseDTO.setErrorMessage("");
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }
@@ -58,8 +58,8 @@ public class ContestController {
                 return contestService.getAllContest();
             } else {
                 ResponseDTO<List<ContestDTO>> responseDTO = new ResponseDTO<>();
-                responseDTO.setStatus("Auth Failed");
-                responseDTO.setErrorMessage("");
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }
@@ -81,11 +81,11 @@ public class ContestController {
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
-                return contestService.getContest(contestId);
+                return contestService.getContest(contestId,requestDTO.getUserId());
             } else {
                 ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
-                responseDTO.setStatus("Auth Failed");
-                responseDTO.setErrorMessage("");
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }

@@ -12,6 +12,6 @@ public interface ContestService {
 
     ResponseDTO<List<ContestDTO>> getAllContest();
 
-    ResponseDTO<ContestDTO> getContest(String contestId);
+    ResponseDTO<ContestDTO> getContest(String contestId,String userId);
 
 }

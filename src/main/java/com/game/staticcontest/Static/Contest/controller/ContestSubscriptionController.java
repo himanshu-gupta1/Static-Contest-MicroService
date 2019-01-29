@@ -21,7 +21,7 @@ public class ContestSubscriptionController {
 
 
     @PostMapping("/subscribe")
-    public ResponseDTO<ContestSubscribedDTO> subscribe(@PathVariable String contestId, @RequestBody RequestDTO<Void> requestDTO) {
+    public ResponseDTO<ContestSubscribedDTO> subscribe(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
 
         try {
             if (verifyUser(requestDTO.getUserId())) {
@@ -29,8 +29,8 @@ public class ContestSubscriptionController {
 
             } else {
                 ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
-                responseDTO.setStatus("Auth Failed");
-                responseDTO.setErrorMessage("");
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }
@@ -58,8 +58,8 @@ public class ContestSubscriptionController {
 
             } else {
                 ResponseDTO<Void> responseDTO = new ResponseDTO<>();
-                responseDTO.setStatus("Auth Failed");
-                responseDTO.setErrorMessage("");
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }

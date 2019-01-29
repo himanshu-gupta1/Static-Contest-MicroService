@@ -17,7 +17,10 @@ public interface ContestSubscribedRepository extends CrudRepository<ContestSubsc
 
 
 
-    @Query(value = "SELECT * FROM contest_subscribed user_id=?2",nativeQuery = true)
+    @Query(value = "SELECT * FROM contest_subscribed WHERE user_id=?1",nativeQuery = true)
     List<ContestSubscribed> getAllContestByUserId(String userId);
+
+
+
 
 }
