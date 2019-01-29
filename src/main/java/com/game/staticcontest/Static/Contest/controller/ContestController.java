@@ -1,28 +1,107 @@
 package com.game.staticcontest.Static.Contest.controller;
 
 import com.game.staticcontest.Static.Contest.dto.ContestDTO;
+import com.game.staticcontest.Static.Contest.dto.RequestDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
 import com.game.staticcontest.Static.Contest.service.ContestService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/contests")
 public class ContestController {
 
     @Autowired
-    ContestService contestService;
+    private ContestService contestService;
 
     @PostMapping("/")
-    public ResponseDTO<Void> addContest(@RequestBody ContestDTO contestDTO) {
-        Contest contest=new Contest();
-        BeanUtils.copyProperties(contestDTO,contest);
+    public ResponseDTO<Void> addContest(@RequestBody RequestDTO<ContestDTO> requestDTO) {
 
-        return contestService.addContest(contest);
+        try {
+            if (verifyUser(requestDTO.getUserId())) {
+                Contest contest = new Contest();
+                ContestDTO contestDTO = requestDTO.getRequest();
+                BeanUtils.copyProperties(contestDTO, contest);
+
+                return contestService.addContest(contest);
+            } else {
+                ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("Auth Failed");
+                responseDTO.setErrorMessage("");
+                responseDTO.setResponse(null);
+                return responseDTO;
+            }
+        } catch (Exception e) {
+            ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+            responseDTO.setStatus("failure");
+            responseDTO.setErrorMessage(e.getMessage());
+            responseDTO.setResponse(null);
+            return responseDTO;
+
+        }
+
+    }
+
+
+    @PostMapping("/getAll")
+    public ResponseDTO<List<ContestDTO>> getAllContest(@RequestBody RequestDTO<Void> requestDTO) {
+
+        try {
+            if (verifyUser(requestDTO.getUserId())) {
+
+                return contestService.getAllContest();
+            } else {
+                ResponseDTO<List<ContestDTO>> responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("Auth Failed");
+                responseDTO.setErrorMessage("");
+                responseDTO.setResponse(null);
+                return responseDTO;
+            }
+        } catch (Exception e) {
+            ResponseDTO<List<ContestDTO>> responseDTO = new ResponseDTO<>();
+            responseDTO.setStatus("failure");
+            responseDTO.setErrorMessage(e.getMessage());
+            responseDTO.setResponse(null);
+            return responseDTO;
+
+        }
+
+    }
+
+
+    @PostMapping("/{contestId}")
+    public ResponseDTO<ContestDTO> getContest(@PathVariable String contestId,@RequestBody RequestDTO<Void> requestDTO) {
+
+        try {
+            if (verifyUser(requestDTO.getUserId())) {
+
+                return contestService.getContest(contestId);
+            } else {
+                ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("Auth Failed");
+                responseDTO.setErrorMessage("");
+                responseDTO.setResponse(null);
+                return responseDTO;
+            }
+        } catch (Exception e) {
+            ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+            responseDTO.setStatus("failure");
+            responseDTO.setErrorMessage(e.getMessage());
+            responseDTO.setResponse(null);
+            return responseDTO;
+
+        }
+
+    }
+
+
+
+
+    public boolean verifyUser(String userId) {
+        return true;
     }
 }

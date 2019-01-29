@@ -11,6 +11,7 @@ public class ContestDTO {
     private String categoryId;
     private boolean active;
     private String difficulty;
+    private boolean isSubscribed;
 
     public String getContestId() {
         return contestId;
@@ -77,9 +78,18 @@ public class ContestDTO {
     }
 
 
+    public boolean isSubscribed() {
+        return isSubscribed;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        isSubscribed = subscribed;
+    }
+
+
     @Override
     public String toString() {
-        return "ContestDetail{" +
+        return "ContestDTO{" +
                 "contestId='" + contestId + '\'' +
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
@@ -88,6 +98,7 @@ public class ContestDTO {
                 ", categoryId='" + categoryId + '\'' +
                 ", active=" + active +
                 ", difficulty='" + difficulty + '\'' +
+                ", isSubscribed=" + isSubscribed +
                 '}';
     }
 }
