@@ -1,5 +1,7 @@
 package com.game.staticcontest.Static.Contest.entity;
 
+import org.hibernate.annotations.GeneratorType;
+
 import javax.persistence.*;
 
 @Entity
