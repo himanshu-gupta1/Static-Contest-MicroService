@@ -1,13 +1,16 @@
 package com.game.staticcontest.Static.Contest.entity;
 
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 
 
+@Entity
 public class ContestPlayArea {
 
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name="uuid",strategy = "uuid2")
     private String contestPlayAreaId;
     private String userId;
 
