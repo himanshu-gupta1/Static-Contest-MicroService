@@ -9,10 +9,12 @@ import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.service.ContestPlayAreaService;
 import com.game.staticcontest.Static.Contest.service.ContestQuestionService;
 import com.game.staticcontest.Static.Contest.service.ContestService;
+import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +32,14 @@ public class ContestPlayAreaController {
 
     @Autowired
     private ContestService contestService;
+
+
+    @Autowired
+    private ContestSubscribedService contestSubscribedService;
+
+
+
+
 
 
 
@@ -69,7 +79,8 @@ public class ContestPlayAreaController {
                     ResponseDTO<QuestionDetailDTO> responseDTO=new ResponseDTO<>();
                     responseDTO.setStatus("success");
                     responseDTO.setErrorMessage("");
-                    responseDTO.setResponse(null);    //call another microservice to get the question details.// .
+//                    responseDTO.setResponse(null);    //call another microservice to get the question details.// .
+                    responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
 
                     return responseDTO;
 
@@ -123,6 +134,29 @@ public class ContestPlayAreaController {
 
     }
 
+    private QuestionDetailDTO getQuestionFromHussain(String questionId) {
+
+//        return null;
+        QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
+        questionDetailDTO.setQuestionId(questionId);
+        questionDetailDTO.setQuestionName("LOL this is question " + questionId);
+        questionDetailDTO.setQuestionContent("This is content : " + questionId );
+        questionDetailDTO.setQuestionType("TEXT");
+
+        OptionDTO optionDTO = new OptionDTO();
+        optionDTO.setOptionId("O1");
+        optionDTO.setOptionContent("Laugh out Loud");
+        List<OptionDTO> optionDTOList = new ArrayList<>();
+        optionDTOList.add(optionDTO);
+        optionDTOList.add(optionDTO);
+        optionDTOList.add(optionDTO);
+        optionDTOList.add(optionDTO);
+
+        questionDetailDTO.setOptionDTOList(optionDTOList);
+        questionDetailDTO.setDuration(60);
+
+        return questionDetailDTO;
+    }
 
 
     @PutMapping("/{questionId}/stop")
@@ -320,6 +354,44 @@ public class ContestPlayAreaController {
         }
 
     }
+
+
+
+    @PostMapping("/submit")
+    public ResponseDTO<ContestSubscribedDTO> submitContest(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
+
+        try {
+            if (verifyUser(requestDTO.getUserId())) {
+
+
+                return contestSubscribedService.finish(contestId,requestDTO.getUserId());
+
+
+
+            } else {
+                ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
+                responseDTO.setResponse(null);
+                return responseDTO;
+            }
+        } catch (Exception e) {
+            ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
+            responseDTO.setStatus("failure");
+            responseDTO.setErrorMessage(e.getMessage());
+            responseDTO.setResponse(null);
+            return responseDTO;
+
+        }
+
+    }
+
+
+
+
+
+
+
 
 
 
