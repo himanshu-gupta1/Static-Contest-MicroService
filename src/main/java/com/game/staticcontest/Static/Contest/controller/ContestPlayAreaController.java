@@ -354,7 +354,7 @@ public class ContestPlayAreaController {
 
     @PostMapping("/skippedQuestion")
     public ResponseDTO<QuestionDetailDTO> getNextSkippedQuestion(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
-
+        System.out.println("Skipped Question Request : "+requestDTO+" "+contestId);
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
@@ -366,6 +366,7 @@ public class ContestPlayAreaController {
                     responseDTO.setStatus("failure");
                     responseDTO.setErrorMessage("No Skipped Questions Availaible");
                     responseDTO.setResponse(null);
+                    System.out.println(responseDTO);
                     return responseDTO;
                 } else {
 
@@ -388,6 +389,7 @@ public class ContestPlayAreaController {
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
+                System.out.println(responseDTO);
                 return responseDTO;
             }
         } catch (Exception e) {
@@ -395,6 +397,7 @@ public class ContestPlayAreaController {
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
+            System.out.println(responseDTO);
             return responseDTO;
 
         }
