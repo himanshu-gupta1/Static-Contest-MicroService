@@ -49,7 +49,7 @@ public class ContestSubscriptionController {
 
 
     @PutMapping("/finished")
-    public ResponseDTO<Void> finish(@PathVariable String contestId,@RequestBody RequestDTO<Void> requestDTO) {
+    public ResponseDTO<ContestSubscribedDTO> finish(@PathVariable String contestId,@RequestBody RequestDTO<Void> requestDTO) {
 
         try {
             if (verifyUser(requestDTO.getUserId())) {
@@ -57,14 +57,14 @@ public class ContestSubscriptionController {
 
 
             } else {
-                ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+                ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+            ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);

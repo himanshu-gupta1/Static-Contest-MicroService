@@ -10,5 +10,5 @@ public interface ContestSubscribedService {
     ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId);
 
 
-    ResponseDTO<Void> finish(String contestId,String userId);
+    ResponseDTO<ContestSubscribedDTO> finish(String contestId,String userId);
 }

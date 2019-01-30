@@ -4,7 +4,9 @@ package com.game.staticcontest.Static.Contest.service.implementation;
 import com.game.staticcontest.Static.Contest.dto.ContestSubscribedDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
+import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
 import com.game.staticcontest.Static.Contest.entity.ContestSubscribed;
+import com.game.staticcontest.Static.Contest.repository.ContestPlayAreaRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestSubscribedRepository;
 import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
@@ -27,6 +29,10 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
 
     @Autowired
     private Environment env;
+
+
+    @Autowired
+    private ContestPlayAreaRepository contestPlayAreaRepository;
 
     @Override
     public ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId) {
@@ -64,23 +70,34 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
     }
 
     @Override
-    public ResponseDTO<Void> finish(String contestId, String userId) {
+    public ResponseDTO<ContestSubscribedDTO> finish(String contestId, String userId) {
 
         //set finished to true and update score of contest by fetching all the questions of that particular contest by using
         //user id
+
+        List<ContestPlayArea> contestPlayAreaList=contestPlayAreaRepository.getContestPlayArea(contestId,userId);
+        double score=0.0;
+        for(ContestPlayArea contestPlayArea:contestPlayAreaList)
+        {
+            score=score+contestPlayArea.getScore();
+        }
 
 
 
 
         ContestSubscribed contestSubscribed=contestSubscribedRepository.getSubscribedContest(contestId,userId);
         //set the score here
+        contestSubscribed.setScore(score);
         contestSubscribed.setFinished(true);
+
         contestSubscribedRepository.save(contestSubscribed);
 
-        ResponseDTO<Void> responseDTO=new ResponseDTO<>();
+        ResponseDTO<ContestSubscribedDTO> responseDTO=new ResponseDTO<>();
         responseDTO.setStatus("success");
         responseDTO.setErrorMessage("");
-        responseDTO.setResponse(null);
+        ContestSubscribedDTO contestSubscribedDTO=new ContestSubscribedDTO();
+        BeanUtils.copyProperties(contestSubscribed,contestSubscribedDTO);
+        responseDTO.setResponse(contestSubscribedDTO);
 
         return responseDTO;
     }
