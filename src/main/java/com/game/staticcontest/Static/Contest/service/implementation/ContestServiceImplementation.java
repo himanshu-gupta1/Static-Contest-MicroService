@@ -67,8 +67,9 @@ public class ContestServiceImplementation implements ContestService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public ResponseDTO<ContestDTO> getContest(String contestId,String userId) {
+        System.out.println("getContest start");
         ResponseDTO<ContestDTO> responseDTO=new ResponseDTO<>();
         responseDTO.setStatus("success");
         responseDTO.setErrorMessage("");
@@ -76,6 +77,7 @@ public class ContestServiceImplementation implements ContestService {
         ContestDTO contestDTO=new ContestDTO();
         BeanUtils.copyProperties(contest,contestDTO);
         ContestSubscribed contestSubscribed=contestSubscribedRepository.getSubscribedContest(contestId,userId);
+        System.out.println("getContest");
         if(contestSubscribed==null)
             contestDTO.setSubscribed(false);
         else

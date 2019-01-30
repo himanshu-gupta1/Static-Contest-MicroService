@@ -11,7 +11,7 @@
 	<groupId>com.game.staticcontest</groupId>
 	<artifactId>Static Contest</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Static Contest</name>
+	<questionName>Static Contest</questionName>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

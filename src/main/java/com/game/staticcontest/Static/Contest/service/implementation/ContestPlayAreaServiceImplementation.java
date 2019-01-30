@@ -4,9 +4,12 @@ import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
 import com.game.staticcontest.Static.Contest.repository.ContestPlayAreaRepository;
 import com.game.staticcontest.Static.Contest.service.ContestPlayAreaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = false)
 public class ContestPlayAreaServiceImplementation implements ContestPlayAreaService {
 
     @Autowired
@@ -24,8 +27,12 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
 
     }
 
+
+    @Modifying
     @Override
+    @Transactional(readOnly = false)
     public ContestPlayArea addContestPlayArea(ContestPlayArea contestPlayArea) {
+        System.out.println("hello");
         return contestPlayAreaRepository.save(contestPlayArea);
     }
 
