@@ -1,19 +1,18 @@
 package com.game.staticcontest.Static.Contest.dto;
 
-import javax.swing.text.AbstractDocument;
 import java.util.List;
 
 public class QuestionDetailDTO {
 
     private String questionId;
-    private String name;
-    private String content;
+    private String questionName;
+    private String questionContent;
     private List<OptionDTO> optionDTOList;
    // private List<OptionDTO> correctDTOList;
-    private String category;
-    private String mediaType;
-    private String ansType;
-    private String difficulty;
+    private String questionCategory;
+    private String questionType;
+    private String answerType;
+    private String questionDifficulty;
     private int duration;
 
 
@@ -25,12 +24,12 @@ public class QuestionDetailDTO {
         this.questionId = questionId;
     }
 
-    public String getName() {
-        return name;
+    public String getQuestionName() {
+        return questionName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setQuestionName(String questionName) {
+        this.questionName = questionName;
     }
 
 
@@ -45,36 +44,36 @@ public class QuestionDetailDTO {
 
 
 
-    public String getCategory() {
-        return category;
+    public String getQuestionCategory() {
+        return questionCategory;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setQuestionCategory(String questionCategory) {
+        this.questionCategory = questionCategory;
     }
 
-    public String getMediaType() {
-        return mediaType;
+    public String getQuestionType() {
+        return questionType;
     }
 
-    public void setMediaType(String mediaType) {
-        this.mediaType = mediaType;
+    public void setQuestionType(String questionType) {
+        this.questionType = questionType;
     }
 
-    public String getAnsType() {
-        return ansType;
+    public String getAnswerType() {
+        return answerType;
     }
 
-    public void setAnsType(String ansType) {
-        this.ansType = ansType;
+    public void setAnswerType(String answerType) {
+        this.answerType = answerType;
     }
 
-    public String getDifficulty() {
-        return difficulty;
+    public String getQuestionDifficulty() {
+        return questionDifficulty;
     }
 
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
+    public void setQuestionDifficulty(String questionDifficulty) {
+        this.questionDifficulty = questionDifficulty;
     }
 
     public int getDuration() {
@@ -86,12 +85,12 @@ public class QuestionDetailDTO {
     }
 
 
-    public String getContent() {
-        return content;
+    public String getQuestionContent() {
+        return questionContent;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setQuestionContent(String questionContent) {
+        this.questionContent = questionContent;
     }
 
 
@@ -99,13 +98,13 @@ public class QuestionDetailDTO {
     public String toString() {
         return "QuestionDetailDTO{" +
                 "questionId='" + questionId + '\'' +
-                ", name='" + name + '\'' +
-                ", content='" + content + '\'' +
+                ", questionName='" + questionName + '\'' +
+                ", questionContent='" + questionContent + '\'' +
                 ", optionDTOList=" + optionDTOList +
-                ", category='" + category + '\'' +
-                ", mediaType='" + mediaType + '\'' +
-                ", ansType='" + ansType + '\'' +
-                ", difficulty='" + difficulty + '\'' +
+                ", questionCategory='" + questionCategory + '\'' +
+                ", questionType='" + questionType + '\'' +
+                ", answerType='" + answerType + '\'' +
+                ", questionDifficulty='" + questionDifficulty + '\'' +
                 ", duration=" + duration +
                 '}';
     }

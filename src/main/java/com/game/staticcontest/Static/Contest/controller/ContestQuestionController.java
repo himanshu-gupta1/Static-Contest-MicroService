@@ -1,6 +1,5 @@
 package com.game.staticcontest.Static.Contest.controller;
 
-import com.game.staticcontest.Static.Contest.dto.QuestionDTO;
 import com.game.staticcontest.Static.Contest.dto.QuestionDetailDTO;
 import com.game.staticcontest.Static.Contest.dto.RequestDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
@@ -8,7 +7,6 @@ import com.game.staticcontest.Static.Contest.entity.Contest;
 import com.game.staticcontest.Static.Contest.entity.ContestQuestion;
 import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.service.ContestQuestionService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,19 +92,19 @@ public class ContestQuestionController {
 
         for(QuestionDetailDTO questionDetailDTO:questionDetailDTOList)
         {
-            if(questionDetailDTO.getMediaType().trim().toLowerCase().equals("text"))
+            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("text"))
             {
                 textBasedLength++;
             }
-            if(questionDetailDTO.getMediaType().trim().toLowerCase().equals("image"))
+            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("image"))
             {
                 imageBasedLength++;
             }
-            if(questionDetailDTO.getMediaType().trim().toLowerCase().equals("audio"))
+            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("audio"))
             {
                 audioBasedLength++;
             }
-            if(questionDetailDTO.getMediaType().trim().toLowerCase().equals("video"))
+            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("video"))
             {
                 videoBasedLength++;
             }
