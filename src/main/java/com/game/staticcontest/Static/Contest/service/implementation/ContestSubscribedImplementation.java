@@ -30,7 +30,9 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
     public ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId) {
 
         int maxLimit=Integer.parseInt(env.getProperty("x"));
+        System.out.println(maxLimit+"");
         List<ContestSubscribed> contestSubscribedList=contestSubscribedRepository.getAllContestByUserId(userId);
+        System.out.println("hello after");
         if(contestSubscribedList.size()<=maxLimit) {
             ContestSubscribed contestSubscribed = new ContestSubscribed();
             Contest contest = new Contest();
@@ -39,6 +41,7 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
             contestSubscribed.setUserId(userId);
             contestSubscribed.setFinished(false);
             contestSubscribed.setScore(0.0);
+            System.out.println("hello");
             ContestSubscribed contestSubscribedAdded=contestSubscribedRepository.save(contestSubscribed);
             ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("success");

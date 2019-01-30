@@ -3,7 +3,9 @@ package com.game.staticcontest.Static.Contest.service.implementation;
 import com.game.staticcontest.Static.Contest.dto.ContestDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
+import com.game.staticcontest.Static.Contest.entity.ContestSubscribed;
 import com.game.staticcontest.Static.Contest.repository.ContestRepository;
+import com.game.staticcontest.Static.Contest.repository.ContestSubscribedRepository;
 import com.game.staticcontest.Static.Contest.service.ContestService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,12 @@ public class ContestServiceImplementation implements ContestService {
 
     @Autowired
     private ContestRepository contestRepository;
+
+
+
+    @Autowired
+    private ContestSubscribedRepository contestSubscribedRepository;
+
 
     @Override
     public ResponseDTO<ContestDTO> addContest(Contest contest) {
@@ -60,13 +68,18 @@ public class ContestServiceImplementation implements ContestService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseDTO<ContestDTO> getContest(String contestId) {
+    public ResponseDTO<ContestDTO> getContest(String contestId,String userId) {
         ResponseDTO<ContestDTO> responseDTO=new ResponseDTO<>();
         responseDTO.setStatus("success");
         responseDTO.setErrorMessage("");
         Contest contest=contestRepository.findOne(contestId);
         ContestDTO contestDTO=new ContestDTO();
         BeanUtils.copyProperties(contest,contestDTO);
+        ContestSubscribed contestSubscribed=contestSubscribedRepository.getSubscribedContest(contestId,userId);
+        if(contestSubscribed==null)
+            contestDTO.setSubscribed(false);
+        else
+            contestDTO.setSubscribed(true);
         responseDTO.setResponse(contestDTO);
         return responseDTO;
     }

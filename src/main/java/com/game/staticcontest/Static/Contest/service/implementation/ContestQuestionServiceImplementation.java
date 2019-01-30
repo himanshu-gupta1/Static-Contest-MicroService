@@ -24,4 +24,12 @@ public class ContestQuestionServiceImplementation implements ContestQuestionServ
 
         return responseDTO;
     }
+
+    @Override
+    public ContestQuestion findByQuestionSequence(String questionSequence) {
+
+        return contestQuestionRepository.findByQuestionSequence(questionSequence);
+    }
+
+
 }

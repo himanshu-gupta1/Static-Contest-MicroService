@@ -6,7 +6,7 @@ public class ContestPlayRequestDTO {
 
     private String questionId;
     private String questionSequence;
-    private List<OptionDTO> userAnswerList;
+    private String optionIds;
 
     public String getQuestionId() {
         return questionId;
@@ -24,21 +24,21 @@ public class ContestPlayRequestDTO {
         this.questionSequence = questionSequence;
     }
 
-    public List<OptionDTO> getUserAnswerList() {
-        return userAnswerList;
+
+    public String getOptionIds() {
+        return optionIds;
     }
 
-    public void setUserAnswerList(List<OptionDTO> userAnswerList) {
-        this.userAnswerList = userAnswerList;
+    public void setOptionIds(String optionIds) {
+        this.optionIds = optionIds;
     }
-
 
     @Override
     public String toString() {
         return "ContestPlayRequestDTO{" +
                 "questionId='" + questionId + '\'' +
                 ", questionSequence='" + questionSequence + '\'' +
-                ", userAnswerList=" + userAnswerList +
+                ", optionIds='" + optionIds + '\'' +
                 '}';
     }
 }

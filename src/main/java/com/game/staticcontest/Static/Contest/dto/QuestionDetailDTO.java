@@ -9,7 +9,7 @@ public class QuestionDetailDTO {
     private String name;
     private String content;
     private List<OptionDTO> optionDTOList;
-    private List<OptionDTO> correctDTOList;
+   // private List<OptionDTO> correctDTOList;
     private String category;
     private String mediaType;
     private String ansType;
@@ -43,13 +43,7 @@ public class QuestionDetailDTO {
         this.optionDTOList = optionDTOList;
     }
 
-    public List<OptionDTO> getCorrectDTOList() {
-        return correctDTOList;
-    }
 
-    public void setCorrectDTOList(List<OptionDTO> correctDTOList) {
-        this.correctDTOList = correctDTOList;
-    }
 
     public String getCategory() {
         return category;
@@ -100,6 +94,7 @@ public class QuestionDetailDTO {
         this.content = content;
     }
 
+
     @Override
     public String toString() {
         return "QuestionDetailDTO{" +
@@ -107,7 +102,6 @@ public class QuestionDetailDTO {
                 ", name='" + name + '\'' +
                 ", content='" + content + '\'' +
                 ", optionDTOList=" + optionDTOList +
-                ", correctDTOList=" + correctDTOList +
                 ", category='" + category + '\'' +
                 ", mediaType='" + mediaType + '\'' +
                 ", ansType='" + ansType + '\'' +

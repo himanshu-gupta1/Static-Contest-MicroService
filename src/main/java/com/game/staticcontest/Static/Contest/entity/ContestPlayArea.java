@@ -24,9 +24,112 @@ public class ContestPlayArea {
     private long skipped;
     private boolean attempted;
     private double score;
-    private String questionNo;
+    private String questionSequence;
 
 
+    public String getContestPlayAreaId() {
+        return contestPlayAreaId;
+    }
+
+    public void setContestPlayAreaId(String contestPlayAreaId) {
+        this.contestPlayAreaId = contestPlayAreaId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public Contest getContest() {
+        return contest;
+    }
+
+    public void setContest(Contest contest) {
+        this.contest = contest;
+    }
+
+    public String getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
+    }
+
+    public Long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
+    }
+
+    public Long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Long endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getUserAnswer() {
+        return userAnswer;
+    }
+
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
+    }
+
+    public long getSkipped() {
+        return skipped;
+    }
+
+    public void setSkipped(long skipped) {
+        this.skipped = skipped;
+    }
+
+    public boolean isAttempted() {
+        return attempted;
+    }
+
+    public void setAttempted(boolean attempted) {
+        this.attempted = attempted;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public String getQuestionSequence() {
+        return questionSequence;
+    }
+
+    public void setQuestionSequence(String questionSequence) {
+        this.questionSequence = questionSequence;
+    }
 
 
+    @Override
+    public String toString() {
+        return "ContestPlayArea{" +
+                "contestPlayAreaId='" + contestPlayAreaId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", contest=" + contest +
+                ", questionId='" + questionId + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", userAnswer='" + userAnswer + '\'' +
+                ", skipped=" + skipped +
+                ", attempted=" + attempted +
+                ", score=" + score +
+                ", questionSequence='" + questionSequence + '\'' +
+                '}';
+    }
 }
