@@ -309,6 +309,53 @@ public class ContestPlayAreaController {
 
     }
 
+//    @PostMapping("/submit")
+//    public ResponseDTO<Void> submitContest(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
+//
+//        try {
+//            if (verifyUser(requestDTO.getUserId())) {
+//
+//                ContestPlayArea contestPlayArea = contestPlayAreaService.getNextSkippedQuestion(contestId, requestDTO.getUserId());
+//                if (contestPlayArea == null) {
+//
+//                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+//                    responseDTO.setStatus("failure");
+//                    responseDTO.setErrorMessage("No Skipped Questions Availaible");
+//                    responseDTO.setResponse(null);
+//                    return responseDTO;
+//                } else {
+//
+//                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+//                    responseDTO.setStatus("success");
+//                    responseDTO.setErrorMessage("");
+//                    String questionId=contestPlayArea.getQuestionId();
+//                    //get the question detail dto from the another microservice and then return it back....for now
+//                    //setting it to null .. will change after integration
+//                    //set the duration of the skipped question to duration-(skipped time-start time)
+//                    //(skipped time - start time ) is in milliseconds so remember to change the type appropriately
+//                    responseDTO.setResponse(null);   //
+//                    return responseDTO;
+//                }
+//
+//            } else {
+//                ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+//                responseDTO.setStatus("failure");
+//                responseDTO.setErrorMessage("Auth Failed");
+//                responseDTO.setResponse(null);
+//                return responseDTO;
+//            }
+//        } catch (Exception e) {
+//            ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+//            responseDTO.setStatus("failure");
+//            responseDTO.setErrorMessage(e.getMessage());
+//            responseDTO.setResponse(null);
+//            return responseDTO;
+//
+//        }
+//
+//    }
+
+
 
 
 
