@@ -1,5 +1,7 @@
 package com.game.staticcontest.Static.Contest.controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.game.staticcontest.Static.Contest.config.RestTemplateConfig;
 import com.game.staticcontest.Static.Contest.dto.*;
 import com.game.staticcontest.Static.Contest.entity.Contest;
 import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
@@ -12,10 +14,15 @@ import com.game.staticcontest.Static.Contest.service.ContestService;
 import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.JsonObjectDeserializer;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -36,6 +43,9 @@ public class ContestPlayAreaController {
 
     @Autowired
     private ContestSubscribedService contestSubscribedService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
 
 
@@ -96,7 +106,8 @@ public class ContestPlayAreaController {
                         responseDTO.setStatus("success");
                         responseDTO.setErrorMessage("");
 //                    responseDTO.setResponse(null);    //call another microservice to get the question details.// .
-                        responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
+                        //responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
+                        responseDTO.setResponse(getQuestionFromServer(contestQuestion.getQuestionId()));
 
                         return responseDTO;
                     }
@@ -127,7 +138,8 @@ public class ContestPlayAreaController {
                     responseDTO.setStatus("success");
                     responseDTO.setErrorMessage("");
                     //responseDTO.setResponse(null);    //call another microservice to get the question details.// .
-                    responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
+                    //responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
+                    responseDTO.setResponse(getQuestionFromServer(contestQuestion.getQuestionId()));
                     contestPlayAreaService.addContestPlayArea(contestPlayArea1);
                     return responseDTO;
 
@@ -176,7 +188,7 @@ public class ContestPlayAreaController {
 
     @PutMapping("/{questionId}/stop")
     public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId, @PathVariable("questionId") String questionId, @RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
-
+        System.out.println("Stop : " + contestId+" : "+questionId+" : "+requestDTO);
         try {
             ContestPlayArea contestPlayArea = contestPlayAreaService.getContestPlayArea(contestId, questionId, requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
@@ -196,33 +208,44 @@ public class ContestPlayAreaController {
                     double difficultyScore = 0.0;
                     int duration = 0; //fetch from questionDetai l by passing question id
                     //question detail will give duration + difficulty of that particular question
+                    QuestionDetailDTO questionDetailDTO=getQuestionFromServer(questionId);
                     contestPlayArea.setEndTime(date.getTime());
                     contestPlayArea.setAttempted(true);
                     contestPlayArea.setSkipped(-1);
                     contestPlayArea.setUserAnswer(requestDTO.getRequest().getOptionIds());
 
+                    //update the user score
+                    if(checkAnswer(questionId,requestDTO.getRequest().getOptionIds()))
+                    {
+                        System.out.println("hello");
+                        String difficulty = questionDetailDTO.getQuestionDifficulty();
 
-                    System.out.println("hello");
+                        if (difficulty.trim().toLowerCase().equals("easy")) {
+                            difficultyScore = 2.0;
 
-                    ResponseDTO<ContestDTO> responseDTO = contestService.getContest(contestId, requestDTO.getUserId());
-                    System.out.println("hello");
-                    String difficulty = responseDTO.getResponse().getDifficulty();
+                        } else if (difficulty.trim().toLowerCase().equals("medium")) {
+                            difficultyScore = 3.0;
+                        } else if (difficulty.trim().toLowerCase().equals("hard")) {
+                            difficultyScore = 5.0;
+                        }
 
-                    if (difficulty.trim().toLowerCase().equals("easy")) {
-                        difficultyScore = 2.0;
-
-                    } else if (difficulty.trim().toLowerCase().equals("medium")) {
-                        difficultyScore = 3.0;
-                    } else if (difficulty.trim().toLowerCase().equals("hard")) {
-                        difficultyScore = 5.0;
+                        contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea,questionDetailDTO.getDuration()*1000));
                     }
+                    else
+                    {
+                        contestPlayArea.setScore(0.0);
+                    }
+
+                    System.out.println("hello");
+
+
 
                     //check answer API call needed
                     // if(answer is correct)
                     //set score as 0
                     //else
                     //set score as
-                    contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, duration));
+                   // contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, duration));
                     System.out.println("hello");
                     contestPlayAreaService.addContestPlayArea(contestPlayArea);
                 }
@@ -311,10 +334,20 @@ public class ContestPlayAreaController {
     public double timeTaken(ContestPlayArea contestPlayArea, int duration) {
         Long startTime = contestPlayArea.getStartTime();
         Long endTime = contestPlayArea.getEndTime();
-        long timeTaken = duration * 1000 - (endTime - startTime);
-        String timeTakenInString = timeTaken + "";
-        int len = timeTakenInString.length();
-        return timeTaken / (double) Math.pow(10, len);
+        double timeTaken;
+        if(endTime-startTime>duration){
+            timeTaken=0;
+        }
+        else {
+            timeTaken = duration - (endTime - startTime);
+            System.out.println("/n/n/n/n/n"+timeTaken+"/n/n/n/n/n");
+            String timeTakenInString[] = (timeTaken + "").split("\\.");
+            int len = timeTakenInString[0].length();
+            timeTaken=timeTaken / (double) Math.pow(10, len);
+            System.out.println("/n/n/n/n/n"+timeTaken+"/n/n/n/n/n/n");
+        }
+
+        return timeTaken;
 
     }
 
@@ -344,7 +377,9 @@ public class ContestPlayAreaController {
                     //setting it to null .. will change after integration
                     //set the duration of the skipped question to duration-(skipped time-start time)
                     //(skipped time - start time ) is in milliseconds so remember to change the type appropriately
-                    responseDTO.setResponse(null);   //
+                    //responseDTO.setResponse(null);   //
+                   // responseDTO.setResponse(getQuestionFromHussain(questionId));
+                    responseDTO.setResponse(getQuestionFromServer(questionId));
                     return responseDTO;
                 }
 
@@ -398,6 +433,31 @@ public class ContestPlayAreaController {
     }
 
 
+
+    public QuestionDetailDTO getQuestionFromServer(String questionId)
+    {
+        String URL="http://10.177.7.115:8000/screeningoutput/getByQuestionId/"+questionId;
+        ResponseEntity<QuestionDetailDTO> response = restTemplate.getForEntity(URL, QuestionDetailDTO.class);
+        System.out.println(response.getBody());
+        return response.getBody();
+
+    }
+
+
+
+
+    public boolean checkAnswer(String questionId,String optionIds)
+    {
+        String URL="http://10.177.7.115:8000/screeningoutput/checkAnswer";
+        HashMap<String,String> hash=new HashMap<>();
+        hash.put("questionId",questionId);
+        hash.put("userAnswer",optionIds);
+        HttpEntity<HashMap<String,String>> request=new HttpEntity<>(hash,null);
+        ResponseEntity<Boolean> response=restTemplate.postForEntity(URL,request,Boolean.class);
+        System.out.println(response.getBody());
+        return response.getBody();
+
+    }
 
 
 

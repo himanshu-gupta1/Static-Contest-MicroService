@@ -26,6 +26,8 @@ public class ContestQuestionController {
     @PostMapping("/")
     public ResponseDTO<Void> addQuestions(@PathVariable("contestId") String contestId,@RequestBody RequestDTO<List<QuestionDetailDTO>> requestDTO) {
         ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+        System.out.println("Questions add API hit");
+        System.out.println(requestDTO.getRequest());
         try {
             if (verifyAdmin(requestDTO.getUserId())) {
 
