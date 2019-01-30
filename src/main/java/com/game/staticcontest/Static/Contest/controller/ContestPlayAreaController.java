@@ -262,25 +262,43 @@ public class ContestPlayAreaController {
 
 
     @PostMapping("/skippedQuestion")
-    public ResponseDTO<ContestDTO> addContest(@RequestBody RequestDTO<ContestDTO> requestDTO) {
+    public ResponseDTO<QuestionDetailDTO> getNextSkippedQuestion(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
 
         try {
             if (verifyUser(requestDTO.getUserId())) {
-                Contest contest = new Contest();
-                contest.setActive(false);
-                ContestDTO contestDTO = requestDTO.getRequest();
-                BeanUtils.copyProperties(contestDTO, contest);
 
-                return contestService.addContest(contest);
+                ContestPlayArea contestPlayArea = contestPlayAreaService.getNextSkippedQuestion(contestId, requestDTO.getUserId());
+                System.out.println(contestPlayArea);
+                if (contestPlayArea == null) {
+
+                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                    responseDTO.setStatus("failure");
+                    responseDTO.setErrorMessage("No Skipped Questions Availaible");
+                    responseDTO.setResponse(null);
+                    return responseDTO;
+                } else {
+
+                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                    responseDTO.setStatus("success");
+                    responseDTO.setErrorMessage("");
+                    String questionId=contestPlayArea.getQuestionId();
+                    //get the question detail dto from the another microservice and then return it back....for now
+                    //setting it to null .. will change after integration
+                    //set the duration of the skipped question to duration-(skipped time-start time)
+                    //(skipped time - start time ) is in milliseconds so remember to change the type appropriately
+                    responseDTO.setResponse(null);   //
+                    return responseDTO;
+                }
+
             } else {
-                ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+                ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
                 return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+            ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
