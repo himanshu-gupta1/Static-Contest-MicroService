@@ -91,7 +91,7 @@ public class ContestPlayAreaController {
                     contestPlayArea1.setQuestionSequence(contestQuestion.getQuestionSequence());
                     // contestPlayArea1.set
 
-                    //setting date
+                    //setting start time
                     Date date=new Date();
                     contestPlayArea1.setStartTime(date.getTime());
 
@@ -125,18 +125,28 @@ public class ContestPlayAreaController {
 
 
     @PutMapping("/{questionId}/stop")
-    public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId,@RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
+    public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId,@PathVariable("questionId") String questionId,@RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
 
         try {
             ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
                 if(requestDTO.getRequest().getOptionIds().equals("")){
 
+                    contestPlayArea.setScore(0);
+                    //no click or click on submit without clicking any radio button
+                    contestPlayAreaService.addContestPlayArea(contestPlayArea);
+
                 }
                 else{
+                    System.out.println("user answer is present");
                     Date date = new Date();
                     double difficultyScore = 0.0;
-                    int duration = 0; //fetch from questionDetail
+                    int duration = 0; //fetch from questionDetail by passing question id
+                    //question detail will give duration + difficulty of that particular question
+
+                    contestPlayArea.setAttempted(true);
+
+
 
                     ResponseDTO<ContestDTO> responseDTO = contestService.getContest(contestId,requestDTO.getUserId());
                     String difficulty = responseDTO.getResponse().getDifficulty();
@@ -154,7 +164,12 @@ public class ContestPlayAreaController {
 
                     contestPlayArea.setEndTime(date.getTime());
                     //check answer API call needed
+                    // if(answer is correct)
+                    //set score as 0
+                    //else
+                    //set score as
                     contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea,duration));
+                    contestPlayAreaService.addContestPlayArea(contestPlayArea);
                 }
 
 //                return contestService.addContest(contest);
@@ -173,8 +188,14 @@ public class ContestPlayAreaController {
             return responseDTO;
 
         }
-        //rishi tetsing s
-        return null;
+
+
+        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+        responseDTO.setStatus("success");
+        responseDTO.setErrorMessage("");
+        responseDTO.setResponse(null);
+        return responseDTO;
+
     }
 
     @GetMapping("/{userId}")
