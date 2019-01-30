@@ -131,6 +131,9 @@ public class ContestPlayAreaController {
 
                     contestPlayArea.setScore(0);
                     //no click or click on submit without clicking any radio button
+                    contestPlayArea.setUserAnswer("");
+                    contestPlayArea.setSkipped(-1);
+                    contestPlayArea.setAttempted(false);
                     contestPlayAreaService.addContestPlayArea(contestPlayArea);
 
                 } else {
@@ -141,6 +144,7 @@ public class ContestPlayAreaController {
                     //question detail will give duration + difficulty of that particular question
 
                     contestPlayArea.setAttempted(true);
+                    contestPlayArea.setSkipped(-1);
 
 
                     System.out.println("hello");
