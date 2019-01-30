@@ -14,8 +14,4 @@ public interface ContestPlayAreaService {
 
     ContestPlayArea addContestPlayArea(ContestPlayArea contestPlayArea);
 
-
-
-
-
 }

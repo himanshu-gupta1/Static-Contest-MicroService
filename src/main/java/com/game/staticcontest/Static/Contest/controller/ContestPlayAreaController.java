@@ -177,6 +177,7 @@ public class ContestPlayAreaController {
         return null;
     }
 
+
     @GetMapping("/{userId}")
     public ContestPlayArea getContestPlayArea(@PathVariable String contestId,@PathVariable String userId) {
 

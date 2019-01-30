@@ -1,5 +1,6 @@
 package com.game.staticcontest.Static.Contest.service.implementation;
 
+import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
 import com.game.staticcontest.Static.Contest.repository.ContestPlayAreaRepository;
 import com.game.staticcontest.Static.Contest.service.ContestPlayAreaService;
