@@ -49,4 +49,9 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
         return contestPlayAreaRepository.getNoOfSkips(contestId,userId);
     }
 
+    @Override
+    public ContestPlayArea getNextSkippedQuestion(String contestId, String userId) {
+        return contestPlayAreaRepository.getNextSkippedQuestion(contestId,userId);
+    }
+
 }

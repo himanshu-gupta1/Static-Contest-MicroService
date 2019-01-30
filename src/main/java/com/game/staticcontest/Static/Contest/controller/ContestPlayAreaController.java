@@ -32,22 +32,19 @@ public class ContestPlayAreaController {
     private ContestService contestService;
 
 
-
-
     @PostMapping("/nextQuestion")
-    public ResponseDTO<QuestionDetailDTO> getNextQuestion(@PathVariable String contestId,@RequestBody RequestDTO<Void> requestDTO) {
+    public ResponseDTO<QuestionDetailDTO> getNextQuestion(@PathVariable String contestId, @RequestBody RequestDTO<Void> requestDTO) {
 
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
-                List<ContestPlayArea> contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
-                if(contestPlayArea!=null)
-                {
-                    String questionSeq=contestPlayAreaService.getMaximumQuestionSequence(contestId,requestDTO.getUserId());
-                    int qs=Integer.parseInt(questionSeq)+1;
-                    ContestQuestion contestQuestion=contestQuestionService.findByQuestionSequence((qs+1)+"");
-                    ContestPlayArea contestPlayArea1=new ContestPlayArea();
-                    Contest contest=new Contest();
+                List<ContestPlayArea> contestPlayArea = contestPlayAreaService.getContestPlayArea(contestId, requestDTO.getUserId());
+                if (contestPlayArea != null) {
+                    String questionSeq = contestPlayAreaService.getMaximumQuestionSequence(contestId, requestDTO.getUserId());
+                    int qs = Integer.parseInt(questionSeq) + 1;
+                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence((qs + 1) + "");
+                    ContestPlayArea contestPlayArea1 = new ContestPlayArea();
+                    Contest contest = new Contest();
                     contest.setContestId(contestId);
                     contestPlayArea1.setContest(contest);
                     contestPlayArea1.setQuestionId(contestQuestion.getQuestionId());
@@ -57,31 +54,27 @@ public class ContestPlayAreaController {
                     contestPlayArea1.setScore(0);
                     contestPlayArea1.setQuestionSequence(contestQuestion.getQuestionSequence());
                     contestPlayAreaService.addContestPlayArea(contestPlayArea1);
-                   // contestPlayArea1.set
+                    // contestPlayArea1.set
 
                     //setting date
-                    Date date=new Date();
+                    Date date = new Date();
                     contestPlayArea1.setStartTime(date.getTime());
 
 
-
-
-                    ResponseDTO<QuestionDetailDTO> responseDTO=new ResponseDTO<>();
+                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
                     responseDTO.setStatus("success");
                     responseDTO.setErrorMessage("");
                     responseDTO.setResponse(null);    //call another microservice to get the question details.// .
 
                     return responseDTO;
 
-                }
-                else
-                {
-                    ContestQuestion contestQuestion=contestQuestionService.findByQuestionSequence("1");
-                    String questionId=contestQuestion.getQuestionId();//call another microservice to get the question details.//// .
+                } else {
+                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence("1");
+                    String questionId = contestQuestion.getQuestionId();//call another microservice to get the question details.//// .
 
 
-                    ContestPlayArea contestPlayArea1=new ContestPlayArea();
-                    Contest contest=new Contest();
+                    ContestPlayArea contestPlayArea1 = new ContestPlayArea();
+                    Contest contest = new Contest();
                     contest.setContestId(contestId);
                     contestPlayArea1.setContest(contest);
                     contestPlayArea1.setQuestionId(contestQuestion.getQuestionId());
@@ -93,10 +86,10 @@ public class ContestPlayAreaController {
                     // contestPlayArea1.set
 
                     //setting start time
-                    Date date=new Date();
+                    Date date = new Date();
                     contestPlayArea1.setStartTime(date.getTime());
 
-                    ResponseDTO<QuestionDetailDTO> responseDTO=new ResponseDTO<>();
+                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
                     responseDTO.setStatus("success");
                     responseDTO.setErrorMessage("");
                     responseDTO.setResponse(null);    //call another microservice to get the question details.// .
@@ -124,21 +117,20 @@ public class ContestPlayAreaController {
     }
 
 
-
     @PutMapping("/{questionId}/stop")
-    public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId,@PathVariable("questionId") String questionId,@RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
+    public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId, @PathVariable("questionId") String questionId, @RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
 
         try {
-            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,questionId,requestDTO.getUserId());
+            ContestPlayArea contestPlayArea = contestPlayAreaService.getContestPlayArea(contestId, questionId, requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
-                if(requestDTO.getRequest().getOptionIds().equals("")){
+                if (requestDTO.getRequest().getOptionIds().equals("")) {
 
                     contestPlayArea.setScore(0);
+                    contestPlayArea.setSkipped(-1);
                     //no click or click on submit without clicking any radio button
                     contestPlayAreaService.addContestPlayArea(contestPlayArea);
 
-                }
-                else{
+                } else {
                     System.out.println("user answer is present");
                     Date date = new Date();
                     double difficultyScore = 0.0;
@@ -146,20 +138,18 @@ public class ContestPlayAreaController {
                     //question detail will give duration + difficulty of that particular question
 
                     contestPlayArea.setAttempted(true);
+                    contestPlayArea.setSkipped(-1);
 
 
-
-                    ResponseDTO<ContestDTO> responseDTO = contestService.getContest(contestId,requestDTO.getUserId());
+                    ResponseDTO<ContestDTO> responseDTO = contestService.getContest(contestId, requestDTO.getUserId());
                     String difficulty = responseDTO.getResponse().getDifficulty();
 
-                    if(difficulty.trim().toLowerCase().equals("easy")) {
+                    if (difficulty.trim().toLowerCase().equals("easy")) {
                         difficultyScore = 2.0;
 
-                    }
-                    else if(difficulty.trim().toLowerCase().equals("medium")) {
+                    } else if (difficulty.trim().toLowerCase().equals("medium")) {
                         difficultyScore = 3.0;
-                    }
-                    else if(difficulty.trim().toLowerCase().equals("hard")) {
+                    } else if (difficulty.trim().toLowerCase().equals("hard")) {
                         difficultyScore = 5.0;
                     }
 
@@ -169,7 +159,7 @@ public class ContestPlayAreaController {
                     //set score as 0
                     //else
                     //set score as
-                    contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea,duration));
+                    contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, duration));
                     contestPlayAreaService.addContestPlayArea(contestPlayArea);
                 }
 
@@ -249,13 +239,12 @@ public class ContestPlayAreaController {
 //    }
 
     @GetMapping("/{userId}")
-    public List<ContestPlayArea> getContestPlayArea(@PathVariable String contestId,@PathVariable String userId) {
+    public List<ContestPlayArea> getContestPlayArea(@PathVariable String contestId, @PathVariable String userId) {
 
-        return contestPlayAreaService.getContestPlayArea(contestId,userId);
+        return contestPlayAreaService.getContestPlayArea(contestId, userId);
 
 
     }
-
 
 
     public boolean verifyUser(String userId) {
@@ -263,15 +252,64 @@ public class ContestPlayAreaController {
     }
 
 
-    public double timeTaken(ContestPlayArea contestPlayArea,int duration) {
+    public double timeTaken(ContestPlayArea contestPlayArea, int duration) {
         Long startTime = contestPlayArea.getStartTime();
         Long endTime = contestPlayArea.getEndTime();
-        long timeTaken=duration*1000-(endTime-startTime);
-        String timeTakenInString=timeTaken+"";
-        int len=timeTakenInString.length();
-        return  timeTaken/(double)Math.pow(10,len);
+        long timeTaken = duration * 1000 - (endTime - startTime);
+        String timeTakenInString = timeTaken + "";
+        int len = timeTakenInString.length();
+        return timeTaken / (double) Math.pow(10, len);
 
     }
+
+
+    @PostMapping("/skippedQuestion")
+    public ResponseDTO<QuestionDetailDTO> getNextSkippedQuestion(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
+
+        try {
+            if (verifyUser(requestDTO.getUserId())) {
+
+                ContestPlayArea contestPlayArea = contestPlayAreaService.getNextSkippedQuestion(contestId, requestDTO.getUserId());
+                if (contestPlayArea == null) {
+
+                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                    responseDTO.setStatus("failure");
+                    responseDTO.setErrorMessage("No Skipped Questions Availaible");
+                    responseDTO.setResponse(null);
+                    return responseDTO;
+                } else {
+
+                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                    responseDTO.setStatus("success");
+                    responseDTO.setErrorMessage("");
+                    String questionId=contestPlayArea.getQuestionId();
+                    //get the question detail dto from the another microservice and then return it back....for now
+                    //setting it to null .. will change after integration
+                    //set the duration of the skipped question to duration-(skipped time-start time)
+                    //(skipped time - start time ) is in milliseconds so remember to change the type appropriately
+                    responseDTO.setResponse(null);   //
+                    return responseDTO;
+                }
+
+            } else {
+                ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("Auth Failed");
+                responseDTO.setResponse(null);
+                return responseDTO;
+            }
+        } catch (Exception e) {
+            ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+            responseDTO.setStatus("failure");
+            responseDTO.setErrorMessage(e.getMessage());
+            responseDTO.setResponse(null);
+            return responseDTO;
+
+        }
+
+    }
+
+
 
 
 

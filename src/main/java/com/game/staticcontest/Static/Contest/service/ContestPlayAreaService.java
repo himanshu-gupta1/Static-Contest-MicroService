@@ -20,4 +20,6 @@ public interface ContestPlayAreaService {
 
     int getNoOfSkips(String contestId, String userId);
 
+    ContestPlayArea getNextSkippedQuestion(String contestId, String userId);
+
 }

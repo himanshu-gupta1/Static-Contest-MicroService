@@ -24,4 +24,9 @@ public interface ContestPlayAreaRepository extends CrudRepository<ContestPlayAre
     int getNoOfSkips(String contestId, String userId);
 
 
+
+    @Query(value = "SELECT * FROM contest_play_area WHERE contest_id=?1 and user_id=?2 and skipped>0 LIMIT 1",nativeQuery = true)
+    ContestPlayArea getNextSkippedQuestion(String contestId, String userId);
+
+
 }
