@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -39,7 +40,7 @@ public class ContestPlayAreaController {
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
-                ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
+                List<ContestPlayArea> contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
                 if(contestPlayArea!=null)
                 {
                     String questionSeq=contestPlayAreaService.getMaximumQuestionSequence(contestId,requestDTO.getUserId());
@@ -128,7 +129,7 @@ public class ContestPlayAreaController {
     public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId,@PathVariable("questionId") String questionId,@RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
 
         try {
-            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
+            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,questionId,requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
                 if(requestDTO.getRequest().getOptionIds().equals("")){
 
@@ -141,16 +142,14 @@ public class ContestPlayAreaController {
                     System.out.println("user answer is present");
                     Date date = new Date();
                     double difficultyScore = 0.0;
-                    int duration = 0; //fetch from questionDetai l by passing question id
+                    int duration = 0; //fetch from questionDetail by passing question id
                     //question detail will give duration + difficulty of that particular question
 
                     contestPlayArea.setAttempted(true);
 
 
-                    System.out.println("hello");
 
                     ResponseDTO<ContestDTO> responseDTO = contestService.getContest(contestId,requestDTO.getUserId());
-                    System.out.println("hello");
                     String difficulty = responseDTO.getResponse().getDifficulty();
 
                     if(difficulty.trim().toLowerCase().equals("easy")) {
@@ -171,7 +170,6 @@ public class ContestPlayAreaController {
                     //else
                     //set score as
                     contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea,duration));
-                    System.out.println("hello");
                     contestPlayAreaService.addContestPlayArea(contestPlayArea);
                 }
 
@@ -202,9 +200,56 @@ public class ContestPlayAreaController {
     }
 
 
+//    @PutMapping("/{questionId}/skip")
+//    public ResponseDTO<Void> (@PathVariable("contestId") String contestId, @PathVariable("questionId") String questionId, @RequestBody RequestDTO<Void> requestDTO) {
+//
+//        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//        try {
+//            ResponseDTO<ContestDTO> responseDTO1 = contestService.getContest(contestId,requestDTO.getUserId());
+//            int skipsAllowed = responseDTO1.getResponse().getSkips();
+//            int noOfSkips = contestPlayAreaService.getNoOfSkips(contestId,requestDTO.getUserId());
+//            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
+//            if (verifyUser(requestDTO.getUserId())) {
+//                if(noOfSkips < skipsAllowed){
+//                    Date date = new Date();
+//                    contestPlayArea.setSkipped(date.getTime());
+//                    //no click or click on submit without clicking any radio button
+//                    contestPlayAreaService.addContestPlayArea(contestPlayArea);
+//
+//                }
+//                else{
+//                    System.out.println("No more Skips Allowed");
+//                    contestPlayAreaService.addContestPlayArea(contestPlayArea);
+//                }
+//
+////                return contestService.addContest(contest);
+//            } else {
+//                ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//                responseDTO.setStatus("failure");
+//                responseDTO.setErrorMessage("Auth Failed");
+//                responseDTO.setResponse(null);
+//                return responseDTO;
+//            }
+//        } catch (Exception e) {
+//            ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//            responseDTO.setStatus("failure");
+//            responseDTO.setErrorMessage(e.getMessage());
+//            responseDTO.setResponse(null);
+//            return responseDTO;
+//
+//        }
+//
+//
+//        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//        responseDTO.setStatus("success");
+//        responseDTO.setErrorMessage("");
+//        responseDTO.setResponse(null);
+//        return responseDTO;
+//
+//    }
 
     @GetMapping("/{userId}")
-    public ContestPlayArea getContestPlayArea(@PathVariable String contestId,@PathVariable String userId) {
+    public List<ContestPlayArea> getContestPlayArea(@PathVariable String contestId,@PathVariable String userId) {
 
         return contestPlayAreaService.getContestPlayArea(contestId,userId);
 
@@ -225,40 +270,6 @@ public class ContestPlayAreaController {
         String timeTakenInString=timeTaken+"";
         int len=timeTakenInString.length();
         return  timeTaken/(double)Math.pow(10,len);
-
-    }
-
-
-
-
-
-
-    @PostMapping("/skippedQuestion")
-    public ResponseDTO<ContestDTO> addContest(@RequestBody RequestDTO<ContestDTO> requestDTO) {
-
-        try {
-            if (verifyUser(requestDTO.getUserId())) {
-                Contest contest = new Contest();
-                contest.setActive(false);
-                ContestDTO contestDTO = requestDTO.getRequest();
-                BeanUtils.copyProperties(contestDTO, contest);
-
-                return contestService.addContest(contest);
-            } else {
-                ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
-                responseDTO.setStatus("failure");
-                responseDTO.setErrorMessage("Auth Failed");
-                responseDTO.setResponse(null);
-                return responseDTO;
-            }
-        } catch (Exception e) {
-            ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
-            responseDTO.setStatus("failure");
-            responseDTO.setErrorMessage(e.getMessage());
-            responseDTO.setResponse(null);
-            return responseDTO;
-
-        }
 
     }
 
