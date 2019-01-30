@@ -38,7 +38,7 @@ public class ContestQuestionController {
                           contest.setContestId(contestId);
                           contestQuestion.setContest(contest);
                           contestQuestion.setQuestionId(questionDetailDTO.getQuestionId());
-                          contestQuestion.setQuestionSequence((sequence++)+"");
+                          contestQuestion.setQuestionSequence((sequence++));
                           contestQuestionService.addQuestion(contestQuestion);
 
                           Contest contestGet=contestRepository.findOne(contestId);

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContestQuestionRepository extends CrudRepository<ContestQuestion, String> {
 
-    ContestQuestion findByQuestionSequence(String questionSequence);
+    ContestQuestion findByQuestionSequence(int questionSequence);
 }

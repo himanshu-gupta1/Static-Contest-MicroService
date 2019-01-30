@@ -24,7 +24,7 @@ public class ContestPlayArea {
     private long skipped;
     private boolean attempted;
     private double score;
-    private String questionSequence;
+    private Integer questionSequence;
 
 
     public String getContestPlayAreaId() {
@@ -107,14 +107,13 @@ public class ContestPlayArea {
         this.score = score;
     }
 
-    public String getQuestionSequence() {
+    public Integer getQuestionSequence() {
         return questionSequence;
     }
 
-    public void setQuestionSequence(String questionSequence) {
+    public void setQuestionSequence(Integer questionSequence) {
         this.questionSequence = questionSequence;
     }
-
 
     @Override
     public String toString() {

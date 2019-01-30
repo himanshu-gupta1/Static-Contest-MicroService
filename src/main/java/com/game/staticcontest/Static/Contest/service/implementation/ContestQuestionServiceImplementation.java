@@ -26,7 +26,7 @@ public class ContestQuestionServiceImplementation implements ContestQuestionServ
     }
 
     @Override
-    public ContestQuestion findByQuestionSequence(String questionSequence) {
+    public ContestQuestion findByQuestionSequence(int questionSequence) {
 
         return contestQuestionRepository.findByQuestionSequence(questionSequence);
     }

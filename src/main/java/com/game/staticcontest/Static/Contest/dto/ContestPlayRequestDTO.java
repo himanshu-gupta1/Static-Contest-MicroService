@@ -5,7 +5,7 @@ import java.util.List;
 public class ContestPlayRequestDTO {
 
     private String questionId;
-    private String questionSequence;
+    private Integer questionSequence;
     private String optionIds;
 
     public String getQuestionId() {
@@ -16,14 +16,13 @@ public class ContestPlayRequestDTO {
         this.questionId = questionId;
     }
 
-    public String getQuestionSequence() {
+    public Integer getQuestionSequence() {
         return questionSequence;
     }
 
-    public void setQuestionSequence(String questionSequence) {
+    public void setQuestionSequence(Integer questionSequence) {
         this.questionSequence = questionSequence;
     }
-
 
     public String getOptionIds() {
         return optionIds;

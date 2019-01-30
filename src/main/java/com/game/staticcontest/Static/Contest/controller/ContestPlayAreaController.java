@@ -53,40 +53,57 @@ public class ContestPlayAreaController {
                 List<ContestPlayArea> contestPlayArea = contestPlayAreaService.getContestPlayArea(contestId, requestDTO.getUserId());
                 if (contestPlayArea.size() != 0) {
                     System.out.println("inside not null");
-                    String questionSeq = contestPlayAreaService.getMaximumQuestionSequence(contestId, requestDTO.getUserId());
-                    int qs = Integer.parseInt(questionSeq) + 1;
-                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence((qs + ""));
-                    ContestPlayArea contestPlayArea1 = new ContestPlayArea();
-                    Contest contest = new Contest();
-                    contest.setContestId(contestId);
-                    contestPlayArea1.setContest(contest);
-                    contestPlayArea1.setQuestionId(contestQuestion.getQuestionId());
-                    contestPlayArea1.setAttempted(false);
-                    contestPlayArea1.setUserId(requestDTO.getUserId());
-                    contestPlayArea1.setSkipped(-1);
-                    contestPlayArea1.setScore(0);
-                    contestPlayArea1.setQuestionSequence(contestQuestion.getQuestionSequence());
+                    Integer questionSeq = contestPlayAreaService.getMaximumQuestionSequence(contestId, requestDTO.getUserId());
+                    System.out.println(questionSeq);
+                    int qs = questionSeq + 1;
+                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(qs);
+                    System.out.println(contestQuestion);
+                    int numberOfQuestions=contestService.getContest(contestId,requestDTO.getUserId()).getResponse().getNoOfQuestions();
+                    System.out.println(numberOfQuestions);
+                    System.out.println(qs+"");
+                    if((qs-1)==numberOfQuestions)
+                    {
+                        System.out.println("inside null of max seq");
+                         ResponseDTO<QuestionDetailDTO> responseDTO=new ResponseDTO<>();
+                         responseDTO.setStatus("failure");
+                         responseDTO.setErrorMessage("check skipped questions");
+                         responseDTO.setResponse(null);
+                         return responseDTO;
+                    }
+                    else {
+                        System.out.println("inside not null of max seq");
+                        ContestPlayArea contestPlayArea1 = new ContestPlayArea();
+                        Contest contest = new Contest();
+                        contest.setContestId(contestId);
+                        contestPlayArea1.setContest(contest);
+                        contestPlayArea1.setQuestionId(contestQuestion.getQuestionId());
+                        contestPlayArea1.setAttempted(false);
+                        contestPlayArea1.setUserId(requestDTO.getUserId());
+                        contestPlayArea1.setSkipped(-1);
+                        contestPlayArea1.setScore(0);
+                        contestPlayArea1.setQuestionSequence(contestQuestion.getQuestionSequence());
 
-                    // contestPlayArea1.set
+                        // contestPlayArea1.set
 
-                    //setting date
-                    Date date = new Date();
-                    contestPlayArea1.setStartTime(date.getTime());
+                        //setting date
+                        Date date = new Date();
+                        contestPlayArea1.setStartTime(date.getTime());
 
-                    contestPlayAreaService.addContestPlayArea(contestPlayArea1);
+                        contestPlayAreaService.addContestPlayArea(contestPlayArea1);
 
 
-                    ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
-                    responseDTO.setStatus("success");
-                    responseDTO.setErrorMessage("");
+                        ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                        responseDTO.setStatus("success");
+                        responseDTO.setErrorMessage("");
 //                    responseDTO.setResponse(null);    //call another microservice to get the question details.// .
-                    responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
+                        responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
 
-                    return responseDTO;
+                        return responseDTO;
+                    }
 
                 } else {
                     System.out.println("inside null");
-                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence("1");
+                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(1);
                     String questionId = contestQuestion.getQuestionId();//call another microservice to get the question details.//// .
 
 
@@ -109,8 +126,8 @@ public class ContestPlayAreaController {
                     ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
                     responseDTO.setStatus("success");
                     responseDTO.setErrorMessage("");
-                    responseDTO.setResponse(null);    //call another microservice to get the question details.// .
-
+                    //responseDTO.setResponse(null);    //call another microservice to get the question details.// .
+                    responseDTO.setResponse(getQuestionFromHussain(contestQuestion.getQuestionId()));
                     contestPlayAreaService.addContestPlayArea(contestPlayArea1);
                     return responseDTO;
 
@@ -164,8 +181,9 @@ public class ContestPlayAreaController {
             ContestPlayArea contestPlayArea = contestPlayAreaService.getContestPlayArea(contestId, questionId, requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
                 if (requestDTO.getRequest().getOptionIds().equals("")) {
-
-                    contestPlayArea.setScore(0);
+                    Date date = new Date();
+                    contestPlayArea.setEndTime(date.getTime());
+                    contestPlayArea.setScore(0.0);
                     //no click or click on submit without clicking any radio button
                     contestPlayArea.setUserAnswer("");
                     contestPlayArea.setSkipped(-1);
@@ -178,9 +196,10 @@ public class ContestPlayAreaController {
                     double difficultyScore = 0.0;
                     int duration = 0; //fetch from questionDetai l by passing question id
                     //question detail will give duration + difficulty of that particular question
-
+                    contestPlayArea.setEndTime(date.getTime());
                     contestPlayArea.setAttempted(true);
                     contestPlayArea.setSkipped(-1);
+                    contestPlayArea.setUserAnswer(requestDTO.getRequest().getOptionIds());
 
 
                     System.out.println("hello");
@@ -198,7 +217,6 @@ public class ContestPlayAreaController {
                         difficultyScore = 5.0;
                     }
 
-                    contestPlayArea.setEndTime(date.getTime());
                     //check answer API call needed
                     // if(answer is correct)
                     //set score as 0

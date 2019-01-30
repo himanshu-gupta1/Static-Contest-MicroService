@@ -20,7 +20,7 @@ public class ContestQuestion {
 
     private String questionId;
 
-    private String questionSequence;
+    private Integer questionSequence;
 
     public String getContestQuestionId() {
         return contestQuestionId;
@@ -46,11 +46,11 @@ public class ContestQuestion {
         this.questionId = questionId;
     }
 
-    public String getQuestionSequence() {
+    public Integer getQuestionSequence() {
         return questionSequence;
     }
 
-    public void setQuestionSequence(String questionSequence) {
+    public void setQuestionSequence(Integer questionSequence) {
         this.questionSequence = questionSequence;
     }
 
