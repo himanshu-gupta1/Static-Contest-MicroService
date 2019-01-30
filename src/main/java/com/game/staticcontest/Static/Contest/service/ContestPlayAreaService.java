@@ -5,13 +5,19 @@ import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
 import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
 
+import java.util.List;
+
 public interface ContestPlayAreaService {
 
-    ContestPlayArea getContestPlayArea(String contestId, String userId);
+    List<ContestPlayArea> getContestPlayArea(String contestId, String userId);
+
+    ContestPlayArea getContestPlayArea(String contestId, String questionId, String userId);
 
     String getMaximumQuestionSequence(String contestId, String userId);
 
 
     ContestPlayArea addContestPlayArea(ContestPlayArea contestPlayArea);
+
+    int getNoOfSkips(String contestId, String userId);
 
 }

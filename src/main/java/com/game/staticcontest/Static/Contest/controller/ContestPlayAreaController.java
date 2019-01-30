@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -39,7 +40,7 @@ public class ContestPlayAreaController {
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
-                ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
+                List<ContestPlayArea> contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
                 if(contestPlayArea!=null)
                 {
                     String questionSeq=contestPlayAreaService.getMaximumQuestionSequence(contestId,requestDTO.getUserId());
@@ -128,7 +129,7 @@ public class ContestPlayAreaController {
     public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId,@PathVariable("questionId") String questionId,@RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
 
         try {
-            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
+            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,questionId,requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
                 if(requestDTO.getRequest().getOptionIds().equals("")){
 
@@ -199,8 +200,56 @@ public class ContestPlayAreaController {
     }
 
 
+//    @PutMapping("/{questionId}/skip")
+//    public ResponseDTO<Void> (@PathVariable("contestId") String contestId, @PathVariable("questionId") String questionId, @RequestBody RequestDTO<Void> requestDTO) {
+//
+//        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//        try {
+//            ResponseDTO<ContestDTO> responseDTO1 = contestService.getContest(contestId,requestDTO.getUserId());
+//            int skipsAllowed = responseDTO1.getResponse().getSkips();
+//            int noOfSkips = contestPlayAreaService.getNoOfSkips(contestId,requestDTO.getUserId());
+//            ContestPlayArea contestPlayArea=contestPlayAreaService.getContestPlayArea(contestId,requestDTO.getUserId());
+//            if (verifyUser(requestDTO.getUserId())) {
+//                if(noOfSkips < skipsAllowed){
+//                    Date date = new Date();
+//                    contestPlayArea.setSkipped(date.getTime());
+//                    //no click or click on submit without clicking any radio button
+//                    contestPlayAreaService.addContestPlayArea(contestPlayArea);
+//
+//                }
+//                else{
+//                    System.out.println("No more Skips Allowed");
+//                    contestPlayAreaService.addContestPlayArea(contestPlayArea);
+//                }
+//
+////                return contestService.addContest(contest);
+//            } else {
+//                ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//                responseDTO.setStatus("failure");
+//                responseDTO.setErrorMessage("Auth Failed");
+//                responseDTO.setResponse(null);
+//                return responseDTO;
+//            }
+//        } catch (Exception e) {
+//            ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//            responseDTO.setStatus("failure");
+//            responseDTO.setErrorMessage(e.getMessage());
+//            responseDTO.setResponse(null);
+//            return responseDTO;
+//
+//        }
+//
+//
+//        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+//        responseDTO.setStatus("success");
+//        responseDTO.setErrorMessage("");
+//        responseDTO.setResponse(null);
+//        return responseDTO;
+//
+//    }
+
     @GetMapping("/{userId}")
-    public ContestPlayArea getContestPlayArea(@PathVariable String contestId,@PathVariable String userId) {
+    public List<ContestPlayArea> getContestPlayArea(@PathVariable String contestId,@PathVariable String userId) {
 
         return contestPlayAreaService.getContestPlayArea(contestId,userId);
 
