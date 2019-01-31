@@ -12,6 +12,8 @@ import com.game.staticcontest.Static.Contest.service.ContestPlayAreaService;
 import com.game.staticcontest.Static.Contest.service.ContestQuestionService;
 import com.game.staticcontest.Static.Contest.service.ContestService;
 import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
+import com.recommendation.kafka_sdk.contest.PlayQuestionKafkaProducer;
+import com.recommendation.kafka_sdk.dto.PlayQuestionKafkaMessage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonObjectDeserializer;
@@ -47,11 +49,8 @@ public class ContestPlayAreaController {
     @Autowired
     private RestTemplate restTemplate;
 
-
-
-
-
-
+    @Autowired
+    private PlayQuestionKafkaProducer playQuestionKafkaProducer;
 
 
     @PostMapping("/nextQuestion")
@@ -68,19 +67,17 @@ public class ContestPlayAreaController {
                     int qs = questionSeq + 1;
                     ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(qs);
                     System.out.println(contestQuestion);
-                    int numberOfQuestions=contestService.getContest(contestId,requestDTO.getUserId()).getResponse().getNoOfQuestions();
+                    int numberOfQuestions = contestService.getContest(contestId, requestDTO.getUserId()).getResponse().getNoOfQuestions();
                     System.out.println(numberOfQuestions);
-                    System.out.println(qs+"");
-                    if((qs-1)==numberOfQuestions)
-                    {
+                    System.out.println(qs + "");
+                    if ((qs - 1) == numberOfQuestions) {
                         System.out.println("inside null of max seq");
-                         ResponseDTO<QuestionDetailDTO> responseDTO=new ResponseDTO<>();
-                         responseDTO.setStatus("failure");
-                         responseDTO.setErrorMessage("check skipped questions");
-                         responseDTO.setResponse(null);
-                         return responseDTO;
-                    }
-                    else {
+                        ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
+                        responseDTO.setStatus("failure");
+                        responseDTO.setErrorMessage("check skipped questions");
+                        responseDTO.setResponse(null);
+                        return responseDTO;
+                    } else {
                         System.out.println("inside not null of max seq");
                         ContestPlayArea contestPlayArea1 = new ContestPlayArea();
                         Contest contest = new Contest();
@@ -168,7 +165,7 @@ public class ContestPlayAreaController {
         QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
         questionDetailDTO.setQuestionId(questionId);
         questionDetailDTO.setQuestionName("LOL this is question " + questionId);
-        questionDetailDTO.setQuestionContent("This is content : " + questionId );
+        questionDetailDTO.setQuestionContent("This is content : " + questionId);
         questionDetailDTO.setQuestionType("TEXT");
 
         OptionDTO optionDTO = new OptionDTO();
@@ -188,7 +185,7 @@ public class ContestPlayAreaController {
 
     @PutMapping("/{questionId}/stop")
     public ResponseDTO<Void> submitQuestion(@PathVariable("contestId") String contestId, @PathVariable("questionId") String questionId, @RequestBody RequestDTO<ContestPlayRequestDTO> requestDTO) {
-        System.out.println("Stop : " + contestId+" : "+questionId+" : "+requestDTO);
+        System.out.println("Stop : " + contestId + " : " + questionId + " : " + requestDTO);
         try {
             ContestPlayArea contestPlayArea = contestPlayAreaService.getContestPlayArea(contestId, questionId, requestDTO.getUserId());
             if (verifyUser(requestDTO.getUserId())) {
@@ -208,15 +205,14 @@ public class ContestPlayAreaController {
                     double difficultyScore = 0.0;
                     int duration = 0; //fetch from questionDetai l by passing question id
                     //question detail will give duration + difficulty of that particular question
-                    QuestionDetailDTO questionDetailDTO=getQuestionFromServer(questionId);
+                    QuestionDetailDTO questionDetailDTO = getQuestionFromServer(questionId);
                     contestPlayArea.setEndTime(date.getTime());
                     contestPlayArea.setAttempted(true);
                     contestPlayArea.setSkipped(-1);
                     contestPlayArea.setUserAnswer(requestDTO.getRequest().getOptionIds());
 
                     //update the user score
-                    if(checkAnswer(questionId,requestDTO.getRequest().getOptionIds()))
-                    {
+                    if (checkAnswer(questionId, requestDTO.getRequest().getOptionIds())) {
                         System.out.println("hello");
                         String difficulty = questionDetailDTO.getQuestionDifficulty();
 
@@ -229,15 +225,22 @@ public class ContestPlayAreaController {
                             difficultyScore = 5.0;
                         }
 
-                        contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea,questionDetailDTO.getDuration()*1000));
-                    }
-                    else
-                    {
+                        contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, questionDetailDTO.getDuration() * 1000));
+                    } else {
                         contestPlayArea.setScore(0.0);
                     }
 
-                    System.out.println("hello");
 
+                    //recomendation system
+                    PlayQuestionKafkaMessage playQuestionKafkaMessage = new PlayQuestionKafkaMessage();
+                    playQuestionKafkaMessage.setUserId(requestDTO.getUserId());
+                    playQuestionKafkaMessage.setCategory(questionDetailDTO.getQuestionCategory());
+                    playQuestionKafkaMessage.setTimestamp(System.nanoTime());
+                    playQuestionKafkaProducer.sendPlayQuestionKafkaMessage(playQuestionKafkaMessage);
+                    //........
+
+
+                    System.out.println("hello");
 
 
                     //check answer API call needed
@@ -245,7 +248,7 @@ public class ContestPlayAreaController {
                     //set score as 0
                     //else
                     //set score as
-                   // contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, duration));
+                    // contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, duration));
                     System.out.println("hello");
                     contestPlayAreaService.addContestPlayArea(contestPlayArea);
                 }
@@ -335,16 +338,15 @@ public class ContestPlayAreaController {
         Long startTime = contestPlayArea.getStartTime();
         Long endTime = contestPlayArea.getEndTime();
         double timeTaken;
-        if(endTime-startTime>duration){
-            timeTaken=0;
-        }
-        else {
+        if (endTime - startTime > duration) {
+            timeTaken = 0;
+        } else {
             timeTaken = duration - (endTime - startTime);
-            System.out.println("/n/n/n/n/n"+timeTaken+"/n/n/n/n/n");
+            System.out.println("/n/n/n/n/n" + timeTaken + "/n/n/n/n/n");
             String timeTakenInString[] = (timeTaken + "").split("\\.");
             int len = timeTakenInString[0].length();
-            timeTaken=timeTaken / (double) Math.pow(10, len);
-            System.out.println("/n/n/n/n/n"+timeTaken+"/n/n/n/n/n/n");
+            timeTaken = timeTaken / (double) Math.pow(10, len);
+            System.out.println("/n/n/n/n/n" + timeTaken + "/n/n/n/n/n/n");
         }
 
         return timeTaken;
@@ -354,7 +356,7 @@ public class ContestPlayAreaController {
 
     @PostMapping("/skippedQuestion")
     public ResponseDTO<QuestionDetailDTO> getNextSkippedQuestion(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
-        System.out.println("Skipped Question Request : "+requestDTO+" "+contestId);
+        System.out.println("Skipped Question Request : " + requestDTO + " " + contestId);
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
@@ -373,13 +375,13 @@ public class ContestPlayAreaController {
                     ResponseDTO<QuestionDetailDTO> responseDTO = new ResponseDTO<>();
                     responseDTO.setStatus("success");
                     responseDTO.setErrorMessage("");
-                    String questionId=contestPlayArea.getQuestionId();
+                    String questionId = contestPlayArea.getQuestionId();
                     //get the question detail dto from the another microservice and then return it back....for now
                     //setting it to null .. will change after integration
                     //set the duration of the skipped question to duration-(skipped time-start time)
                     //(skipped time - start time ) is in milliseconds so remember to change the type appropriately
                     //responseDTO.setResponse(null);   //
-                   // responseDTO.setResponse(getQuestionFromHussain(questionId));
+                    // responseDTO.setResponse(getQuestionFromHussain(questionId));
                     responseDTO.setResponse(getQuestionFromServer(questionId));
                     return responseDTO;
                 }
@@ -405,7 +407,6 @@ public class ContestPlayAreaController {
     }
 
 
-
     @PostMapping("/submit")
     public ResponseDTO<ContestSubscribedDTO> submitContest(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
 
@@ -413,8 +414,7 @@ public class ContestPlayAreaController {
             if (verifyUser(requestDTO.getUserId())) {
 
 
-                return contestSubscribedService.finish(contestId,requestDTO.getUserId());
-
+                return contestSubscribedService.finish(contestId, requestDTO.getUserId());
 
 
             } else {
@@ -436,10 +436,8 @@ public class ContestPlayAreaController {
     }
 
 
-
-    public QuestionDetailDTO getQuestionFromServer(String questionId)
-    {
-        String URL="http://10.177.7.115:8000/screeningoutput/getByQuestionId/"+questionId;
+    public QuestionDetailDTO getQuestionFromServer(String questionId) {
+        String URL = "http://10.177.7.115:8000/screeningoutput/getByQuestionId/" + questionId;
         ResponseEntity<QuestionDetailDTO> response = restTemplate.getForEntity(URL, QuestionDetailDTO.class);
         System.out.println(response.getBody());
         return response.getBody();
@@ -447,26 +445,17 @@ public class ContestPlayAreaController {
     }
 
 
-
-
-    public boolean checkAnswer(String questionId,String optionIds)
-    {
-        String URL="http://10.177.7.115:8000/screeningoutput/checkAnswer";
-        HashMap<String,String> hash=new HashMap<>();
-        hash.put("questionId",questionId);
-        hash.put("userAnswer",optionIds);
-        HttpEntity<HashMap<String,String>> request=new HttpEntity<>(hash,null);
-        ResponseEntity<Boolean> response=restTemplate.postForEntity(URL,request,Boolean.class);
+    public boolean checkAnswer(String questionId, String optionIds) {
+        String URL = "http://10.177.7.115:8000/screeningoutput/checkAnswer";
+        HashMap<String, String> hash = new HashMap<>();
+        hash.put("questionId", questionId);
+        hash.put("userAnswer", optionIds);
+        HttpEntity<HashMap<String, String>> request = new HttpEntity<>(hash, null);
+        ResponseEntity<Boolean> response = restTemplate.postForEntity(URL, request, Boolean.class);
         System.out.println(response.getBody());
         return response.getBody();
 
     }
-
-
-
-
-
-
 
 
 }
