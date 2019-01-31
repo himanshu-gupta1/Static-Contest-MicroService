@@ -407,9 +407,10 @@ public class ContestPlayAreaController {
     }
 
 
+
     @PostMapping("/submit")
     public ResponseDTO<ContestSubscribedDTO> submitContest(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
-
+        System.out.println("Submit check : " + requestDTO + "Contest Id : " + contestId);
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
