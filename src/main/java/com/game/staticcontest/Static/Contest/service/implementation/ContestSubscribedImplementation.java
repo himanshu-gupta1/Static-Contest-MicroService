@@ -1,21 +1,28 @@
 package com.game.staticcontest.Static.Contest.service.implementation;
 
 
+import com.game.staticcontest.Static.Contest.dto.ContestDTO;
 import com.game.staticcontest.Static.Contest.dto.ContestSubscribedDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
+import com.game.staticcontest.Static.Contest.dto.SubmitContestDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
 import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
 import com.game.staticcontest.Static.Contest.entity.ContestSubscribed;
 import com.game.staticcontest.Static.Contest.repository.ContestPlayAreaRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestSubscribedRepository;
+import com.game.staticcontest.Static.Contest.service.ContestService;
 import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -33,6 +40,12 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
 
     @Autowired
     private ContestPlayAreaRepository contestPlayAreaRepository;
+
+    @Autowired
+    private ContestService contestService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId) {
@@ -99,6 +112,23 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
         BeanUtils.copyProperties(contestSubscribed,contestSubscribedDTO);
         responseDTO.setResponse(contestSubscribedDTO);
 
+        ResponseDTO<ContestDTO> contest = contestService.getContest(contestId,userId);
+
+        SubmitContestDTO submitContestDTO = new SubmitContestDTO();
+        submitContestDTO.setContestId(contestId);
+        submitContestDTO.setScore(score);
+        submitContestDTO.setUserId(userId);
+        submitContestDTO.setContestName(contest.getResponse().getName());
+
+        System.out.println(submitContest(submitContestDTO));
+
+
         return responseDTO;
+    }
+
+    public String submitContest(SubmitContestDTO submitContestDTO) {
+        String URL="http://10.177.7.118:8000/getReport/addToLeaderboard";
+        ResponseEntity<String> response=restTemplate.postForEntity(URL,submitContestDTO,String.class);
+        return response.getBody();
     }
 }
