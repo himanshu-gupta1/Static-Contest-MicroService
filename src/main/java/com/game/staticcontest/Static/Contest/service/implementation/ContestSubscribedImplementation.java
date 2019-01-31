@@ -100,6 +100,8 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
             //Contest contestGet=contestRepository.findOne(contestId);
             submitSubscriptionDTO.setContestName(contestGet.getName());
             submitSubscriptionDTO.setUserId(userId);
+            String message=submitSubscriptionInformation(submitSubscriptionDTO);
+            System.out.println(message);
             //call the api to send the submit subscription dto
 
 
@@ -171,4 +173,14 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
         ResponseEntity<String> response=restTemplate.postForEntity(URL,submitContestDTO,String.class);
         return response.getBody();
     }
+
+
+
+
+    public String submitSubscriptionInformation(SubmitSubscriptionDTO submitSubscriptionDTO) {
+        String URL="http://10.177.7.118:8000/getReport/addNewSubscriber";
+        ResponseEntity<String> response=restTemplate.postForEntity(URL,submitSubscriptionDTO,String.class);
+        return response.getBody();
+    }
+
 }
