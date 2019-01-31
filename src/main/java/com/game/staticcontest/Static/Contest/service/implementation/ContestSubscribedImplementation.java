@@ -41,7 +41,7 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
         System.out.println(maxLimit+"");
         List<ContestSubscribed> contestSubscribedList=contestSubscribedRepository.getAllContestByUserId(userId);
         System.out.println("hello after");
-        if(contestSubscribedList.size()<=maxLimit) {
+        if(contestSubscribedList.size()<maxLimit) {
             ContestSubscribed contestSubscribed = new ContestSubscribed();
             Contest contest = new Contest();
             contest.setContestId(contestId);
