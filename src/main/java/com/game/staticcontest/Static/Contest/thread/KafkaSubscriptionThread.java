@@ -19,13 +19,17 @@ public class KafkaSubscriptionThread extends Thread {
 
     @Override
     public void run() {
-        SubscribeContestKafkaMessage subscribeContestKafkaMessage = new SubscribeContestKafkaMessage();
-        subscribeContestKafkaMessage.setUserId(userId);
+        try {
+            SubscribeContestKafkaMessage subscribeContestKafkaMessage = new SubscribeContestKafkaMessage();
+            subscribeContestKafkaMessage.setUserId(userId);
 
 
-        subscribeContestKafkaMessage.setCategory(categoryId);
-        subscribeContestKafkaMessage.setTimestamp(System.nanoTime());
+            subscribeContestKafkaMessage.setCategory(categoryId);
+            subscribeContestKafkaMessage.setTimestamp(System.nanoTime());
 
-        subscribeKafkaProducer.sendSubscribeKafkaMessage(subscribeContestKafkaMessage);
+            subscribeKafkaProducer.sendSubscribeKafkaMessage(subscribeContestKafkaMessage);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
