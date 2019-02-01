@@ -1,8 +1,14 @@
 package com.game.staticcontest.Static.Contest.service.implementation;
 
+import com.contest.notificationProducer.dto.Header;
+import com.contest.notificationProducer.notificationEnum.NotificationMedium;
+import com.contest.notificationProducer.notificationEnum.NotificationType;
+import com.contest.notificationProducer.producer.ContestProducer;
 import com.game.staticcontest.Static.Contest.dto.ContestDTO;
+import com.game.staticcontest.Static.Contest.dto.QuestionDetailDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
+import com.game.staticcontest.Static.Contest.entity.ContestQuestion;
 import com.game.staticcontest.Static.Contest.entity.ContestSubscribed;
 import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestSubscribedRepository;
@@ -14,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,9 +35,12 @@ public class ContestServiceImplementation implements ContestService {
     @Autowired
     private ContestSubscribedRepository contestSubscribedRepository;
 
+    @Autowired
+    private ContestProducer contestProducer;
+
 
     @Override
-    public ResponseDTO<ContestDTO> addContest(Contest contest) {
+    public ResponseDTO<ContestDTO> addContest(Contest contest,String userId) {
         ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
 
 
@@ -77,12 +87,23 @@ public class ContestServiceImplementation implements ContestService {
         ContestDTO contestDTO=new ContestDTO();
         BeanUtils.copyProperties(contest,contestDTO);
         ContestSubscribed contestSubscribed=contestSubscribedRepository.getSubscribedContest(contestId,userId);
+
         System.out.println("getContest");
-        if(contestSubscribed==null)
+        if(contestSubscribed==null) {
             contestDTO.setSubscribed(false);
-        else
+            contestDTO.setFinished(false);
+        }
+        else {
             contestDTO.setSubscribed(true);
+            contestDTO.setFinished(contestSubscribed.isFinished());
+            }
+
         responseDTO.setResponse(contestDTO);
         return responseDTO;
     }
+
+
+
+
+
 }

@@ -8,10 +8,13 @@ import java.util.List;
 
 public interface ContestService {
 
-    ResponseDTO<ContestDTO> addContest(Contest contest);
+    ResponseDTO<ContestDTO> addContest(Contest contest,String userId);
 
     ResponseDTO<List<ContestDTO>> getAllContest();
 
     ResponseDTO<ContestDTO> getContest(String contestId,String userId);
+
+
+
 
 }

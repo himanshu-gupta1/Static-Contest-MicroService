@@ -25,105 +25,37 @@ public class ContestQuestionController {
 
     @PostMapping("/")
     public ResponseDTO<Void> addQuestions(@PathVariable("contestId") String contestId,@RequestBody RequestDTO<List<QuestionDetailDTO>> requestDTO) {
-        ResponseDTO<Void> responseDTO = new ResponseDTO<>();
+        ResponseDTO<Void> responseDTO;
         System.out.println("Questions add API hit");
         System.out.println(requestDTO.getRequest());
         try {
             if (verifyAdmin(requestDTO.getUserId())) {
 
-                if (checkQuestions(requestDTO.getRequest())) {
-                    int sequence = 1;
-                    for (QuestionDetailDTO questionDetailDTO : requestDTO.getRequest()) {
+                responseDTO=contestQuestionService.addQuestionToContest(contestId,requestDTO.getRequest());
 
-                          Contest contest=new Contest();
-                          ContestQuestion contestQuestion=new ContestQuestion();
-                          contest.setContestId(contestId);
-                          contestQuestion.setContest(contest);
-                          contestQuestion.setQuestionId(questionDetailDTO.getQuestionId());
-                          contestQuestion.setQuestionSequence((sequence++));
-                          contestQuestionService.addQuestion(contestQuestion);
 
-                          Contest contestGet=contestRepository.findOne(contestId);
-                          System.out.println(contestGet);
-                          contestGet.setActive(true);
-                          contestRepository.save(contestGet);
-                    }
-                    responseDTO.setStatus("success");
-                    responseDTO.setErrorMessage("");
-                    responseDTO.setResponse(null);
-
-                } else {
-
-                    responseDTO.setStatus("failure");
-                    responseDTO.setErrorMessage("Question Ratio Does Not Match");
-                    responseDTO.setResponse(null);
-                    return responseDTO;
-
-                }
             } else {
+                responseDTO=new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
             }
-            return responseDTO;
         }
 
         catch(Exception e){
+            responseDTO=new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
-            return responseDTO;
+
         }
+
+        return responseDTO;
     }
 
 
 
-    public boolean checkQuestions(List<QuestionDetailDTO> questionDetailDTOList)
-    {
 
-        //40 -- text based
-        //20 -- image based
-        //20 -- video based
-        //20 -- audio based
-
-        int len=questionDetailDTOList.size();
-        int textBasedLength=0;
-        int imageBasedLength=0;
-        int audioBasedLength=0;
-        int videoBasedLength=0;
-
-        for(QuestionDetailDTO questionDetailDTO:questionDetailDTOList)
-        {
-            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("text"))
-            {
-                textBasedLength++;
-            }
-            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("image"))
-            {
-                imageBasedLength++;
-            }
-            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("audio"))
-            {
-                audioBasedLength++;
-            }
-            if(questionDetailDTO.getQuestionType().trim().toLowerCase().equals("video"))
-            {
-                videoBasedLength++;
-            }
-        }
-
-        if(textBasedLength/(double)len==0.4 && imageBasedLength/(double)len==0.2 &&
-                videoBasedLength/(double)len==0.2 && audioBasedLength/(double)len==0.2)
-        {
-           return true;
-        }
-        else
-        {
-            return false;
-        }
-
-
-    }
 
 
     //getbyquestionNo.

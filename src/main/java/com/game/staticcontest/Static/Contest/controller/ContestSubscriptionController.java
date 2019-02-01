@@ -22,26 +22,25 @@ public class ContestSubscriptionController {
 
     @PostMapping("/subscribe")
     public ResponseDTO<ContestSubscribedDTO> subscribe(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
-
+        ResponseDTO<ContestSubscribedDTO> responseDTO;
         try {
             if (verifyUser(requestDTO.getUserId())) {
-                return contestSubscribedService.subscribe(contestId,requestDTO.getUserId());
+                responseDTO = contestSubscribedService.subscribe(contestId,requestDTO.getUserId());
 
             } else {
-                ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
+                responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
-                return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
+            responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
-            return responseDTO;
-
         }
+
+        return responseDTO;
 
     }
 
@@ -51,6 +50,7 @@ public class ContestSubscriptionController {
     @PutMapping("/finished")
     public ResponseDTO<ContestSubscribedDTO> finish(@PathVariable String contestId,@RequestBody RequestDTO<Void> requestDTO) {
 
+        System.out.println("finish method called");
         try {
             if (verifyUser(requestDTO.getUserId())) {
                 return contestSubscribedService.finish(contestId,requestDTO.getUserId());

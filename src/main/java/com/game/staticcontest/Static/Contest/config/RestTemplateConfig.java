@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@ComponentScan(basePackages = {"com.recommendation.kafka_sdk"})
+@ComponentScan(basePackages = {"com.recommendation.kafka_sdk","com.contest.notificationProducer"})
 public class RestTemplateConfig {
 
     @Bean

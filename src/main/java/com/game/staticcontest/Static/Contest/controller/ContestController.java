@@ -21,83 +21,78 @@ public class ContestController {
 
     @PostMapping("/")
     public ResponseDTO<ContestDTO> addContest(@RequestBody RequestDTO<ContestDTO> requestDTO) {
-
+       ResponseDTO<ContestDTO> responseDTO;
         try {
             if (verifyUser(requestDTO.getUserId())) {
                 Contest contest = new Contest();
                 contest.setActive(false);
                 ContestDTO contestDTO = requestDTO.getRequest();
                 BeanUtils.copyProperties(contestDTO, contest);
+                responseDTO=contestService.addContest(contest,requestDTO.getUserId());
 
-                return contestService.addContest(contest);
             } else {
-                ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+                responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
-                return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+            responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
-            return responseDTO;
+            }
 
-        }
+        return responseDTO;
 
     }
 
 
     @PostMapping("/getAll")
     public ResponseDTO<List<ContestDTO>> getAllContest(@RequestBody RequestDTO<Void> requestDTO) {
-
+        ResponseDTO<List<ContestDTO>> responseDTO;
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
-                return contestService.getAllContest();
+                responseDTO = contestService.getAllContest();
             } else {
-                ResponseDTO<List<ContestDTO>> responseDTO = new ResponseDTO<>();
+                responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
-                return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<List<ContestDTO>> responseDTO = new ResponseDTO<>();
+            responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
-            return responseDTO;
-
         }
 
+        return responseDTO;
     }
 
 
     @PostMapping("/{contestId}")
     public ResponseDTO<ContestDTO> getContest(@PathVariable String contestId,@RequestBody RequestDTO<Void> requestDTO) {
-
+        ResponseDTO<ContestDTO> responseDTO;
         try {
             if (verifyUser(requestDTO.getUserId())) {
 
-                return contestService.getContest(contestId,requestDTO.getUserId());
+                responseDTO = contestService.getContest(contestId,requestDTO.getUserId());
             } else {
-                ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+                responseDTO = new ResponseDTO<>();
                 responseDTO.setStatus("failure");
                 responseDTO.setErrorMessage("Auth Failed");
                 responseDTO.setResponse(null);
-                return responseDTO;
             }
         } catch (Exception e) {
-            ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
+            responseDTO = new ResponseDTO<>();
             responseDTO.setStatus("failure");
             responseDTO.setErrorMessage(e.getMessage());
             responseDTO.setResponse(null);
-            return responseDTO;
-
         }
 
+        return responseDTO;
     }
 
 

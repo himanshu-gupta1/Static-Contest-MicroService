@@ -12,6 +12,7 @@ public class ContestDTO {
     private boolean active;
     private String difficulty;
     private boolean isSubscribed;
+    private boolean isFinished;
 
     public String getContestId() {
         return contestId;
@@ -86,6 +87,13 @@ public class ContestDTO {
         isSubscribed = subscribed;
     }
 
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
 
     @Override
     public String toString() {
@@ -99,6 +107,7 @@ public class ContestDTO {
                 ", active=" + active +
                 ", difficulty='" + difficulty + '\'' +
                 ", isSubscribed=" + isSubscribed +
+                ", isFinished=" + isFinished +
                 '}';
     }
 }
