@@ -197,45 +197,12 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
 
 
     public List<String> getFollowersFromUserId(String userId) {
-        String URL = "http://10.177.7.124:8081/follow/getFollow/" + userId;
+        String URL = env.getProperty("follower.server.address")+"/follow/getFollow/" + userId;
         ResponseEntity<List<String>> responseEntity = restTemplate.exchange(URL, HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {
         });
         return responseEntity.getBody();
 
     }
-
-
-
-    public void sendSubscriptionNotification(String contestId,String userId)
-    {
-        try {
-            Header header = new Header();
-            SubscriptionNotice subscriptionNotice = new SubscriptionNotice();
-            subscriptionNotice.setContestId(contestId);
-            subscriptionNotice.setContestName(contestRepository.findOne(contestId).getName());
-            //subscriptionNotice.setFollowerIds(getFollowersFromUserId(userId));
-            List<String> list=new ArrayList<>();
-            list.add("8a8a7a69-b642-4f7f-a4ef-2b43a370c3fe");
-            list.add("20ed6f87-9799-48da-ac39-83df54f56329");
-            subscriptionNotice.setFollowerIds(list);
-            List<NotificationMedium> notificationMediumList = new ArrayList<>();
-            notificationMediumList.add(NotificationMedium.EMAIL);
-            header.setNotificationMedium(notificationMediumList);
-            header.setNotificationType(NotificationType.SUBSCRIPTION_NOTICE);
-            header.setTimeStamp(new Date().toString());
-            header.setNotificationTypeBody(subscriptionNotice);
-            header.setNotificationMedium(notificationMediumList);
-            header.setReceiver(userId);
-            System.out.println("User id received from subscription: "+ userId);
-            subscriptionNoticeProducer.send(header);
-
-        } catch (FieldsCanNotBeEmpty fieldsCanNotBeEmpty) {
-            fieldsCanNotBeEmpty.printStackTrace();
-        }
-    }
-
-
-
 
 
 }
