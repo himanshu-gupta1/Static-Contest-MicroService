@@ -11,6 +11,7 @@ import com.game.staticcontest.Static.Contest.entity.ContestQuestion;
 import com.game.staticcontest.Static.Contest.repository.ContestQuestionRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.service.ContestQuestionService;
+import com.game.staticcontest.Static.Contest.thread.AddContesNotificationThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +69,8 @@ public class ContestQuestionServiceImplementation implements ContestQuestionServ
 
                 //sending notification....
                 Contest contestGet=contestRepository.findOne(contestId);
-                sendNotification(contestGet);
+                AddContesNotificationThread addContesNotificationThread=new AddContesNotificationThread(contestGet);
+                addContesNotificationThread.start();
                 //..................
 
                 System.out.println(contestGet);
@@ -138,34 +140,6 @@ public class ContestQuestionServiceImplementation implements ContestQuestionServ
         else
         {
             return false;
-        }
-
-
-    }
-
-
-
-    public void sendNotification(Contest contest)
-    {
-
-
-        try {
-            Header header = new Header();
-            com.contest.notificationProducer.dto.Contest contestN = new com.contest.notificationProducer.dto.Contest();
-            contestN.setContestId(contest.getContestId());
-            contestN.setContestName(contest.getName());
-            List<NotificationMedium> notificationMediumList = new ArrayList<>();
-            notificationMediumList.add(NotificationMedium.EMAIL);
-            header.setNotificationMedium(notificationMediumList);
-            header.setNotificationType(NotificationType.CONTEST);
-            header.setTimeStamp(new Date().toString());
-            header.setNotificationTypeBody(contestN);
-            header.setReceiver("");
-            contestProducer.send(header);
-        }
-        catch(Exception e)
-        {
-            System.out.println(e.getMessage());
         }
 
 

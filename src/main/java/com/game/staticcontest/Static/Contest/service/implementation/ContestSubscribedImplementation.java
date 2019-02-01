@@ -174,7 +174,8 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
         submitContestDTO.setUserId(userId);
         submitContestDTO.setContestName(contest.getResponse().getName());
 
-        System.out.println(submitContest(submitContestDTO));
+        String res=submitContest(submitContestDTO);
+        System.out.println(res);
 
 
         return responseDTO;

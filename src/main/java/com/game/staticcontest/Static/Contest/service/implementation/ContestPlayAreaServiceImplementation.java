@@ -7,6 +7,7 @@ import com.contest.notificationProducer.notificationEnum.NotificationType;
 import com.contest.notificationProducer.producer.SubscriptionNoticeProducer;
 import com.game.staticcontest.Static.Contest.dto.ContestDTO;
 import com.game.staticcontest.Static.Contest.dto.QuestionDetailDTO;
+import com.game.staticcontest.Static.Contest.dto.QuestionResponseDTO;
 import com.game.staticcontest.Static.Contest.dto.ResponseDTO;
 import com.game.staticcontest.Static.Contest.entity.Contest;
 import com.game.staticcontest.Static.Contest.entity.ContestPlayArea;
@@ -62,6 +63,7 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
 
     @Autowired
     private Environment environment;
+
 
 
 
@@ -177,6 +179,7 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
 
         ResponseDTO<Void> responseDTO = new ResponseDTO<>();
         ContestPlayArea contestPlayArea = getContestPlayArea(contestId, questionId, userId);
+        String res;
         if (optionIds.equals("")) {
             Date date = new Date();
             contestPlayArea.setEndTime(date.getTime());
@@ -186,8 +189,10 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
             contestPlayArea.setSkipped(-1);
             contestPlayArea.setAttempted(false);
             addContestPlayArea(contestPlayArea);
+            res=sendQuestionInfo(questionId,false);
 
         } else {
+            boolean send=true;
             System.out.println("user answer is present");
             Date date = new Date();
             double difficultyScore = 0.0;
@@ -215,10 +220,12 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
 
                 contestPlayArea.setScore(difficultyScore + timeTaken(contestPlayArea, questionDetailDTO.getDuration() * 1000));
             } else {
+                send=false;
                 contestPlayArea.setScore(0.0);
             }
 
 
+            res=sendQuestionInfo(questionId,send);
             //recomendation system
             sendRecommentdation(userId,questionDetailDTO);
             //........
@@ -237,6 +244,8 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
             addContestPlayArea(contestPlayArea);
         }
 
+
+        System.out.println(res);
         responseDTO.setStatus("success");
         responseDTO.setErrorMessage("");
         responseDTO.setResponse(null);
@@ -384,6 +393,19 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
         playQuestionKafkaMessage.setCategory(questionDetailDTO.getQuestionCategory());
         playQuestionKafkaMessage.setTimestamp(System.nanoTime());
         playQuestionKafkaProducer.sendPlayQuestionKafkaMessage(playQuestionKafkaMessage);
+
+    }
+
+
+    public String sendQuestionInfo(String questionId,boolean send)
+    {
+        String URL=environment.getProperty("leaderboard.server.address")+"/getReport/addQuestionStatistics";
+        //String URL = "http://10.177.7.118:8000/getReport/addNewSubscriber";
+        QuestionResponseDTO questionResponseDTO=new QuestionResponseDTO();
+        questionResponseDTO.setCorrectResponse(send);
+        questionResponseDTO.setQuestionId(questionId);
+        ResponseEntity<String> response = restTemplate.postForEntity(URL, questionResponseDTO, String.class);
+        return response.getBody();
 
     }
 
