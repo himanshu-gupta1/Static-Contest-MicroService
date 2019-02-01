@@ -16,6 +16,7 @@ import com.game.staticcontest.Static.Contest.repository.ContestRepository;
 import com.game.staticcontest.Static.Contest.repository.ContestSubscribedRepository;
 import com.game.staticcontest.Static.Contest.service.ContestService;
 import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
+import com.game.staticcontest.Static.Contest.thread.KafkaSubscriptionThread;
 import com.game.staticcontest.Static.Contest.thread.SubscriptionNotificationThread;
 import com.recommendation.kafka_sdk.contest.SubscribeKafkaProducer;
 import com.recommendation.kafka_sdk.dto.SubscribeContestKafkaMessage;
@@ -54,14 +55,6 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
     private ContestRepository contestRepository;
 
     @Autowired
-    private SubscribeKafkaProducer subscribeKafkaProducer;
-
-
-    @Autowired
-    private SubscriptionNoticeProducer subscriptionNoticeProducer;
-
-
-    @Autowired
     private ContestService contestService;
 
     @Autowired
@@ -70,70 +63,75 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
     @Override
     public ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId) {
 
-        int maxLimit = Integer.parseInt(env.getProperty("x"));
-        System.out.println(maxLimit + "");
-        List<ContestSubscribed> contestSubscribedList = contestSubscribedRepository.getAllContestByUserId(userId);
-        System.out.println("hello after");
-        if (contestSubscribedList.size() < maxLimit) {
-            ContestSubscribed contestSubscribed = new ContestSubscribed();
-            Contest contest = new Contest();
-            contest.setContestId(contestId);
-            contestSubscribed.setContest(contest);
-            contestSubscribed.setUserId(userId);
-            contestSubscribed.setFinished(false);
-            contestSubscribed.setScore(0.0);
-            System.out.println("hello");
+        ContestSubscribed contestSubscribed1 = contestSubscribedRepository.getSubscribedContest(contestId,userId);
+        ResponseDTO<ContestSubscribedDTO> responseDTO;
+        if(contestSubscribed1==null) {
+            int maxLimit = Integer.parseInt(env.getProperty("x"));
+            System.out.println(maxLimit + "");
+            List<ContestSubscribed> contestSubscribedList = contestSubscribedRepository.getAllContestByUserId(userId);
+            System.out.println("hello after");
+            if (contestSubscribedList.size() < maxLimit) {
+                ContestSubscribed contestSubscribed = new ContestSubscribed();
+                Contest contest = new Contest();
+                contest.setContestId(contestId);
+                contestSubscribed.setContest(contest);
+                contestSubscribed.setUserId(userId);
+                contestSubscribed.setFinished(false);
+                contestSubscribed.setScore(0.0);
+                System.out.println("hello");
 
 
-            //saving in the contest_subscribed table
-            ContestSubscribed contestSubscribedAdded = contestSubscribedRepository.save(contestSubscribed);
+                //saving in the contest_subscribed table
+                ContestSubscribed contestSubscribedAdded = contestSubscribedRepository.save(contestSubscribed);
 
 
-            //sending the notification
-            Thread myThread = new SubscriptionNotificationThread(contestId,userId);
-            myThread.start();
-            //sendSubscriptionNotification();
-            //......
+                //sending the notification
+                Thread myThread = new SubscriptionNotificationThread(contestId,userId);
+                myThread.start();
+                //sendSubscriptionNotification();
+                //......
 
 
-            //send the subscription info to the kafka recommendations system
-            SubscribeContestKafkaMessage subscribeContestKafkaMessage = new SubscribeContestKafkaMessage();
-            subscribeContestKafkaMessage.setUserId(userId);
+                //send the subscription info to the kafka recommendations system
+                Contest contestGet = contestRepository.findOne(contestId);
+                Thread kafkaThread = new KafkaSubscriptionThread(userId,contestGet.getCategoryId());
+                kafkaThread.start();
+                //......
 
-            Contest contestGet = contestRepository.findOne(contestId);
-            subscribeContestKafkaMessage.setCategory(contestGet.getCategoryId());
-            subscribeContestKafkaMessage.setTimestamp(System.nanoTime());
-
-            subscribeKafkaProducer.sendSubscribeKafkaMessage(subscribeContestKafkaMessage);
-
-            //......
-
-            //sending the update for the same to another microservice...
-            SubmitSubscriptionDTO submitSubscriptionDTO = new SubmitSubscriptionDTO();
-            submitSubscriptionDTO.setContestId(contestId);
-            //Contest contestGet=contestRepository.findOne(contestId);
-            submitSubscriptionDTO.setContestName(contestGet.getName());
-            submitSubscriptionDTO.setUserId(userId);
-            String message = submitSubscriptionInformation(submitSubscriptionDTO);
-            System.out.println(message);
-            //call the api to send the submit subscription dto
+                //sending the update for the same to another microservice...
+                SubmitSubscriptionDTO submitSubscriptionDTO = new SubmitSubscriptionDTO();
+                submitSubscriptionDTO.setContestId(contestId);
+                //Contest contestGet=contestRepository.findOne(contestId);
+                submitSubscriptionDTO.setContestName(contestGet.getName());
+                submitSubscriptionDTO.setUserId(userId);
+                String message = submitSubscriptionInformation(submitSubscriptionDTO);
+                System.out.println(message);
+                //call the api to send the submit subscription dto
 
 
-            //...........
-            ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
-            responseDTO.setStatus("success");
-            responseDTO.setErrorMessage("");
-            ContestSubscribedDTO contestSubscribedDTO = new ContestSubscribedDTO();
-            BeanUtils.copyProperties(contestSubscribedAdded, contestSubscribedDTO);
-            responseDTO.setResponse(contestSubscribedDTO);
-            return responseDTO;
-        } else {
-            ResponseDTO<ContestSubscribedDTO> responseDTO = new ResponseDTO<>();
-            responseDTO.setStatus("failure");
-            responseDTO.setErrorMessage("You have reached your maximum subscription limit");
-            responseDTO.setResponse(null);
-            return responseDTO;
+                //...........
+                responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("success");
+                responseDTO.setErrorMessage("");
+                ContestSubscribedDTO contestSubscribedDTO = new ContestSubscribedDTO();
+                BeanUtils.copyProperties(contestSubscribedAdded, contestSubscribedDTO);
+                responseDTO.setResponse(contestSubscribedDTO);
+                return responseDTO;
+            } else {
+                responseDTO = new ResponseDTO<>();
+                responseDTO.setStatus("failure");
+                responseDTO.setErrorMessage("You have reached your maximum subscription limit");
+                responseDTO.setResponse(null);
+                return responseDTO;
+            }
         }
+        else {
+            responseDTO = new ResponseDTO<>();
+            responseDTO.setStatus("failure");
+            responseDTO.setErrorMessage("You are already subscribed to this contest");
+            responseDTO.setResponse(null);
+        }
+        return responseDTO;
     }
 
     @Override
