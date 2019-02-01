@@ -66,18 +66,19 @@ public class ContestQuestionServiceImplementation implements ContestQuestionServ
                 contestQuestion.setQuestionId(questionDetailDTO.getQuestionId());
                 contestQuestion.setQuestionSequence((sequence++));
                 addQuestion(contestQuestion);
-
-                //sending notification....
-                Contest contestGet=contestRepository.findOne(contestId);
-                AddContesNotificationThread addContesNotificationThread=new AddContesNotificationThread(contestGet);
-                addContesNotificationThread.start();
-                //..................
-
-                System.out.println(contestGet);
-                contestGet.setActive(true);
-
-                contestRepository.save(contestGet);
             }
+
+            //sending notification....
+            Contest contestGet=contestRepository.findOne(contestId);
+            AddContesNotificationThread addContesNotificationThread=new AddContesNotificationThread(contestGet,contestProducer);
+            addContesNotificationThread.start();
+            //..................
+
+            System.out.println(contestGet);
+            contestGet.setActive(true);
+
+            contestRepository.save(contestGet);
+
             responseDTO.setStatus("success");
             responseDTO.setErrorMessage("");
             responseDTO.setResponse(null);

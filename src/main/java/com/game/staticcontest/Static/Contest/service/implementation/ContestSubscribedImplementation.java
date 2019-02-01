@@ -18,6 +18,7 @@ import com.game.staticcontest.Static.Contest.service.ContestService;
 import com.game.staticcontest.Static.Contest.service.ContestSubscribedService;
 import com.game.staticcontest.Static.Contest.thread.KafkaSubscriptionThread;
 import com.game.staticcontest.Static.Contest.thread.SubscriptionNotificationThread;
+import com.recommendation.kafka_sdk.contest.PlayQuestionKafkaProducer;
 import com.recommendation.kafka_sdk.contest.SubscribeKafkaProducer;
 import com.recommendation.kafka_sdk.dto.SubscribeContestKafkaMessage;
 import org.springframework.beans.BeanUtils;
@@ -60,6 +61,13 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private SubscriptionNoticeProducer subscriptionNoticeProducer;
+
+
+    @Autowired
+    private PlayQuestionKafkaProducer playQuestionKafkaProducer;
+
     @Override
     public ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId) {
 
@@ -86,7 +94,7 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
 
 
                 //sending the notification
-                Thread myThread = new SubscriptionNotificationThread(contestId,userId);
+                Thread myThread = new SubscriptionNotificationThread(contestId,userId,subscriptionNoticeProducer,contestRepository);
                 myThread.start();
                 //sendSubscriptionNotification();
                 //......
@@ -94,7 +102,7 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
 
                 //send the subscription info to the kafka recommendations system
                 Contest contestGet = contestRepository.findOne(contestId);
-                Thread kafkaThread = new KafkaSubscriptionThread(userId,contestGet.getCategoryId());
+                Thread kafkaThread = new KafkaSubscriptionThread(userId,contestGet.getCategoryId(),playQuestionKafkaProducer);
                 kafkaThread.start();
                 //......
 

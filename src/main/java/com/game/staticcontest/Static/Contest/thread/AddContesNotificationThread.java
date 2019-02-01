@@ -14,19 +14,20 @@ import java.util.List;
 public class AddContesNotificationThread extends Thread {
 
 
-
-    @Autowired
     private ContestProducer contestProducer;
 
     private Contest contest;
-    public AddContesNotificationThread (Contest contest){
+    public AddContesNotificationThread (Contest contest,ContestProducer contestProducer){
         this.contest=contest;
+        this.contestProducer=contestProducer;
     }
 
 
     @Override
     public void run() {
         try {
+
+            System.out.println("Add Contest Thread called");
             Header header = new Header();
             com.contest.notificationProducer.dto.Contest contestN = new com.contest.notificationProducer.dto.Contest();
             contestN.setContestId(contest.getContestId());

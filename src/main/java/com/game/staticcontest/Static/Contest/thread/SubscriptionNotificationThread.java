@@ -15,19 +15,20 @@ import java.util.List;
 
 public class SubscriptionNotificationThread extends Thread {
 
-    @Autowired
-    ContestRepository contestRepository;
 
-    @Autowired
-    SubscriptionNoticeProducer subscriptionNoticeProducer;
+    private ContestRepository contestRepository;
+
+    private SubscriptionNoticeProducer subscriptionNoticeProducer;
 
     private String contestId;
     private String userId;
 
 
-    public SubscriptionNotificationThread (String contestId, String userId){
+    public SubscriptionNotificationThread (String contestId, String userId,SubscriptionNoticeProducer subscriptionNoticeProducer,ContestRepository contestRepository){
         this.contestId=contestId;
         this.userId=userId;
+        this.subscriptionNoticeProducer=subscriptionNoticeProducer;
+        this.contestRepository=contestRepository;
     }
 
 

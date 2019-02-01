@@ -19,6 +19,7 @@ import com.game.staticcontest.Static.Contest.repository.ContestSubscribedReposit
 import com.game.staticcontest.Static.Contest.service.ContestPlayAreaService;
 import com.game.staticcontest.Static.Contest.service.ContestQuestionService;
 import com.game.staticcontest.Static.Contest.service.ContestService;
+import com.game.staticcontest.Static.Contest.thread.KafkaSubscriptionThread;
 import com.recommendation.kafka_sdk.contest.PlayQuestionKafkaProducer;
 import com.recommendation.kafka_sdk.dto.PlayQuestionKafkaMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,7 +228,8 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
 
             res=sendQuestionInfo(questionId,send);
             //recomendation system
-            sendRecommentdation(userId,questionDetailDTO);
+            KafkaSubscriptionThread kafkaSubscriptionThread=new KafkaSubscriptionThread(userId,questionDetailDTO.getQuestionCategory(),playQuestionKafkaProducer);
+
             //........
 
 
@@ -385,16 +387,16 @@ public class ContestPlayAreaServiceImplementation implements ContestPlayAreaServ
 
 
 
-    public void sendRecommentdation(String userId,QuestionDetailDTO questionDetailDTO)
-    {
-
-        PlayQuestionKafkaMessage playQuestionKafkaMessage = new PlayQuestionKafkaMessage();
-        playQuestionKafkaMessage.setUserId(userId);
-        playQuestionKafkaMessage.setCategory(questionDetailDTO.getQuestionCategory());
-        playQuestionKafkaMessage.setTimestamp(System.nanoTime());
-        playQuestionKafkaProducer.sendPlayQuestionKafkaMessage(playQuestionKafkaMessage);
-
-    }
+//    public void sendRecommentdation(String userId,QuestionDetailDTO questionDetailDTO)
+//    {
+//
+//        PlayQuestionKafkaMessage playQuestionKafkaMessage = new PlayQuestionKafkaMessage();
+//        playQuestionKafkaMessage.setUserId(userId);
+//        playQuestionKafkaMessage.setCategory(questionDetailDTO.getQuestionCategory());
+//        playQuestionKafkaMessage.setTimestamp(System.nanoTime());
+//        playQuestionKafkaProducer.sendPlayQuestionKafkaMessage(playQuestionKafkaMessage);
+//
+//    }
 
 
     public String sendQuestionInfo(String questionId,boolean send)
