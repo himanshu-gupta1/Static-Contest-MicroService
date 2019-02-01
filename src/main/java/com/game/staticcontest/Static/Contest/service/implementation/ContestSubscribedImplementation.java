@@ -63,7 +63,7 @@ public class ContestSubscribedImplementation implements ContestSubscribedService
 
     @Override
     public ResponseDTO<ContestSubscribedDTO> subscribe(String contestId, String userId) {
-
+        System.out.println("Subscribe : "+contestId+" "+userId);
         int maxLimit=Integer.parseInt(env.getProperty("x"));
         System.out.println(maxLimit+"");
         List<ContestSubscribed> contestSubscribedList=contestSubscribedRepository.getAllContestByUserId(userId);

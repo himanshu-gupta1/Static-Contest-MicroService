@@ -7,6 +7,6 @@ public interface ContestQuestionService {
 
     ResponseDTO<Void> addQuestion(ContestQuestion contestQuestion);
 
-    ContestQuestion findByQuestionSequence(int questionSequence);
+    ContestQuestion findByQuestionSequence(int questionSequence, String contestId);
 
 }

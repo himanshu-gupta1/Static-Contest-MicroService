@@ -22,7 +22,7 @@ public class ContestSubscriptionController {
 
     @PostMapping("/subscribe")
     public ResponseDTO<ContestSubscribedDTO> subscribe(@PathVariable("contestId") String contestId, @RequestBody RequestDTO<Void> requestDTO) {
-
+        System.out.println("Contest Id : "+contestId+" User Id : "+requestDTO.getUserId());
         try {
             if (verifyUser(requestDTO.getUserId())) {
                 return contestSubscribedService.subscribe(contestId,requestDTO.getUserId());

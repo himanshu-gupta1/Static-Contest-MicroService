@@ -65,7 +65,7 @@ public class ContestPlayAreaController {
                     Integer questionSeq = contestPlayAreaService.getMaximumQuestionSequence(contestId, requestDTO.getUserId());
                     System.out.println(questionSeq);
                     int qs = questionSeq + 1;
-                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(qs);
+                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(qs,contestId);
                     System.out.println(contestQuestion);
                     int numberOfQuestions = contestService.getContest(contestId, requestDTO.getUserId()).getResponse().getNoOfQuestions();
                     System.out.println(numberOfQuestions);
@@ -111,7 +111,7 @@ public class ContestPlayAreaController {
 
                 } else {
                     System.out.println("inside null");
-                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(1);
+                    ContestQuestion contestQuestion = contestQuestionService.findByQuestionSequence(1,contestId);
                     String questionId = contestQuestion.getQuestionId();//call another microservice to get the question details.//// .
 
 
