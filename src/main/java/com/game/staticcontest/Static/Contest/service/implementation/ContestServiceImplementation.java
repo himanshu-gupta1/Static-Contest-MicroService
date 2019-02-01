@@ -44,6 +44,8 @@ public class ContestServiceImplementation implements ContestService {
         ResponseDTO<ContestDTO> responseDTO = new ResponseDTO<>();
 
 
+        contest.setActive(false);
+        contest.setType("static");
         Contest contestAdded=contestRepository.save(contest);
 
         responseDTO.setStatus("success");
